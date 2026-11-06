@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda — Meu Espaço Psicopedagógico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <div class="container">
+    <div class="card">
+      <h2>Novo atendimento</h2>
+      <label>Aluno</label>
+      <select id="agAluno"></select>
+
+      <label>Data</label>
+      <input id="agData" type="date" />
+
+      <label>Horário</label>
+      <input id="agHora" type="time" />
+
+      <label>Duração (minutos)</label>
+      <input id="agDuracao" type="number" value="50" min="10" step="10" />
+
+      <label>Modalidade</label>
+      <select id="agModalidade">
+        <option value="presencial">Presencial</option>
+        <option value="online">Online</option>
+      </select>
+
+      <label>Status</label>
+      <select id="agStatus">
+        <option value="agendado">Agendado</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="realizado">Realizado</option>
+        <option value="cancelado">Cancelado</option>
+        <option value="falta">Falta</option>
+      </select>
+
+      <label>Objetivo / observação</label>
+      <input id="agObjetivo" type="text" placeholder="Objetivo do encontro" />
+
+      <button class="primary" id="btnSalvarAg">Agendar</button>
+      <div id="msgAg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Próximos atendimentos</h2>
+      <table>
+        <thead>
+          <tr><th>Data</th><th>Hora</th><th>Aluno</th><th>Status</th><th>Ações</th></tr>
+        </thead>
+        <tbody id="listaAgenda">
+          <tr><td colspan="5" style="text-align:center; color:#6B6B6B;">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+<script src="js/menu.js"></script>
+  <script src="js/agenda.js"></script>
+</body>
+</html>

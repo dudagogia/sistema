@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alunos — Meu Espaço Psicopedagógico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <div class="container">
+    <!-- Cadastro de aluno -->
+    <div class="card">
+      <h2>Novo aluno</h2>
+      <label for="nome">Nome completo</label>
+      <input id="nome" type="text" placeholder="Nome do aluno" />
+
+      <label for="nascimento">Data de nascimento</label>
+      <input id="nascimento" type="date" />
+
+      <label for="escola">Escola</label>
+      <input id="escola" type="text" placeholder="Escola" />
+
+      <label for="status">Status</label>
+      <select id="status">
+        <option value="ativo">Ativo</option>
+        <option value="avaliacao">Em avaliação</option>
+        <option value="pausado">Pausado</option>
+        <option value="encerrado">Encerrado</option>
+      </select>
+
+      <label for="responsavel">Responsável (nome e telefone)</label>
+      <input id="responsavel" type="text" placeholder="Ex: Maria — (11) 99999-9999" />
+
+      <button class="primary" id="btnSalvar">Salvar aluno</button>
+      <div id="msgAluno" class="msg"></div>
+    </div>
+
+    <!-- Lista de alunos -->
+    <div class="card">
+      <h2>Alunos cadastrados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Status</th>
+            <th>Escola</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="listaAlunos">
+          <tr><td colspan="4" style="text-align:center; color:#6B6B6B;">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Documentos (link Google Drive) -->
+    <div class="card">
+      <h2>Documentos (link do Google Drive)</h2>
+      <p style="font-size:0.85rem; color:#6B6B6B; margin-bottom:12px;">
+        Faça o upload do arquivo no Google Drive, copie o link privado e cole aqui.
+      </p>
+
+      <label for="docAluno">Aluno</label>
+      <select id="docAluno"></select>
+
+      <label for="docNome">Nome do documento</label>
+      <input id="docNome" type="text" placeholder="Ex: Laudo avaliação inicial" />
+
+      <label for="docCategoria">Categoria</label>
+      <select id="docCategoria">
+        <option value="avaliacao">Avaliação</option>
+        <option value="relatorio">Relatório</option>
+        <option value="atividade">Atividade</option>
+        <option value="escolar">Documento escolar</option>
+        <option value="outro">Outro</option>
+      </select>
+
+      <label for="docUrl">Link do Google Drive</label>
+      <input id="docUrl" type="url" placeholder="https://drive.google.com/..." />
+
+      <button class="primary" id="btnSalvarDoc">Salvar documento</button>
+      <div id="msgDoc" class="msg"></div>
+
+      <h2 style="margin-top:24px;">Documentos cadastrados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>Documento</th>
+            <th>Categoria</th>
+            <th>Link</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="listaDocs">
+          <tr><td colspan="5" style="text-align:center; color:#6B6B6B;">Nenhum documento.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+<script src="js/menu.js"></script>
+  <script src="js/alunos.js"></script>
+</body>
+</html>

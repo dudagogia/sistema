@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar — Meu Espaço Psicopedagógico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-box">
+      <h1>Meu Espaço Psicopedagógico</h1>
+      <p class="sub">Acesse sua conta para continuar</p>
+
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="seu@email.com" />
+
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" placeholder="••••••••" />
+
+      <button class="primary" id="btnEntrar">Entrar</button>
+
+      <div id="msg" class="msg"></div>
+
+      <p style="text-align:center; margin-top:16px; font-size:0.85rem;">
+        <a href="#" id="linkRecuperar">Esqueci minha senha</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+<script src="js/menu.js"></script>
+
+  <script>
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('btnEntrar');
+
+    // Se já estiver logado, vai direto para o dashboard
+    auth.onAuthStateChanged((user) => {
+      if (user) window.location.href = 'dashboard.html';
+    });
+
+    btn.addEventListener('click', async () => {
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+
+      if (!email || !senha) {
+        msg.className = 'msg erro';
+        msg.textContent = 'Preencha e-mail e senha.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+      try {
+        await fazerLogin(email, senha);
+        // onAuthStateChanged já redireciona
+      } catch (e) {
+        msg.className = 'msg erro';
+        msg.textContent = 'E-mail ou senha inválidos.';
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    });
+
+    // Recuperação de senha
+    document.getElementById('linkRecuperar').addEventListener('click', async (ev) => {
+      ev.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        msg.className = 'msg erro';
+        msg.textContent = 'Digite seu e-mail para recuperar a senha.';
+        return;
+      }
+      try {
+        await auth.sendPasswordResetEmail(email);
+        msg.className = 'msg sucesso';
+        msg.textContent = 'Link de recuperação enviado para o e-mail.';
+      } catch (e) {
+        msg.className = 'msg erro';
+        msg.textContent = 'Não foi possível enviar. Verifique o e-mail.';
+      }
+    });
+  </script>
+</body>
+</html>
