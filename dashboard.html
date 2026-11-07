@@ -5,137 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Meu Espaço Psicopedagógico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div id="app-header"></div>
+  <div id="app-header"></div>
 
   <div class="container">
-  <div class="card">
-    <h2 id="saudacao">Olá!</h2>
-    <p id="dataAtual" style="color:#6B6B6B; margin-top:4px;"></p>
-  </div>
+    <div class="card">
+      <h2 id="saudacao">Olá!</h2>
+      <p id="dataAtual" style="color:#8A6A72; margin-top:4px;"></p>
+    </div>
 
-  <div class="card">
-    <h2>Resumo do mês</h2>
-    <div style="display:flex; gap:16px; flex-wrap:wrap;">
-      <div style="flex:1; min-width:130px;">
-        <p style="color:#6B6B6B; font-size:0.85rem;">Alunos ativos</p>
-        <p style="font-size:1.6rem; color:#1F4E5F; font-weight:600;" id="qtdAlunos">0</p>
+    <div class="card">
+      <h2>Resumo do mês</h2>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div class="indicador">
+          <p>Alunos ativos</p>
+          <p style="color:#9C4258;" id="qtdAlunos">0</p>
+        </div>
+        <div class="indicador">
+          <p>Recebido no mês</p>
+          <p style="color:#6FA97A;" id="dashReceitas">R$ 0,00</p>
+        </div>
+        <div class="indicador">
+          <p>Pendente</p>
+          <p style="color:#E0A96D;" id="dashPendentes">R$ 0,00</p>
+        </div>
+        <div class="indicador">
+          <p>Despesas</p>
+          <p style="color:#C9556B;" id="dashDespesas">R$ 0,00</p>
+        </div>
       </div>
-      <div style="flex:1; min-width:130px;">
-        <p style="color:#6B6B6B; font-size:0.85rem;">Recebido no mês</p>
-        <p style="font-size:1.6rem; color:#3E7C4F; font-weight:600;" id="dashReceitas">R$ 0,00</p>
-      </div>
-      <div style="flex:1; min-width:130px;">
-        <p style="color:#6B6B6B; font-size:0.85rem;">Pendente</p>
-        <p style="font-size:1.6rem; color:#C9A227; font-weight:600;" id="dashPendentes">R$ 0,00</p>
-      </div>
-      <div style="flex:1; min-width:130px;">
-        <p style="color:#6B6B6B; font-size:0.85rem;">Despesas</p>
-        <p style="font-size:1.6rem; color:#B23A48; font-weight:600;" id="dashDespesas">R$ 0,00</p>
+    </div>
+
+    <div class="card">
+      <h2>Próximos atendimentos</h2>
+      <ul id="proximosAtendimentos" style="list-style:none; padding:0;">
+        <li style="color:#8A6A72;">Carregando...</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Atalhos</h2>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="alunos.html"><button class="secundario">+ Aluno</button></a>
+        <a href="agenda.html"><button class="secundario">+ Atendimento</button></a>
+        <a href="evolucao.html"><button class="secundario">+ Evolução</button></a>
+        <a href="financeiro.html"><button class="secundario">+ Receita</button></a>
+        <a href="relatorios.html"><button class="secundario">+ Relatório</button></a>
       </div>
     </div>
   </div>
-
-  <div class="card">
-    <h2>Próximos atendimentos</h2>
-    <ul id="proximosAtendimentos" style="list-style:none; padding:0;">
-      <li style="color:#6B6B6B;">Carregando...</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>Atalhos</h2>
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <a href="alunos.html"><button class="secundario">+ Aluno</button></a>
-      <a href="agenda.html"><button class="secundario">+ Atendimento</button></a>
-      <a href="evolucao.html"><button class="secundario">+ Evolução</button></a>
-      <a href="financeiro.html"><button class="secundario">+ Receita</button></a>
-      <a href="relatorios.html"><button class="secundario">+ Relatório</button></a>
-    </div>
-  </div>
-</div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
-<script src="js/menu.js"></script>
-
+  <script src="js/menu.js"></script>
   <script>
-  protegerPagina();
-  document.getElementById('btnSair').addEventListener('click', fazerLogout);
+    protegerPagina();
+    const fmt = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  const fmt = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) return;
 
-  auth.onAuthStateChanged(async (user) => {
-    if (!user) return;
+      const hora = new Date().getHours();
+      const periodo = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+      document.getElementById('saudacao').textContent = `${periodo}, bem-vinda!`;
 
-    const hora = new Date().getHours();
-    const periodo = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
-    document.getElementById('saudacao').textContent = `${periodo}, bem-vinda!`;
+      const hoje = new Date();
+      document.getElementById('dataAtual').textContent = hoje.toLocaleDateString('pt-BR',
+        { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-    const hoje = new Date();
-    document.getElementById('dataAtual').textContent = hoje.toLocaleDateString('pt-BR',
-      { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const mesAtual = hoje.toISOString().slice(0, 7);
 
-    const mesAtual = hoje.toISOString().slice(0, 7);
+      const alSnap = await db.collection('students').where('ownerId', '==', user.uid).get();
+      const ativos = alSnap.docs.filter(d => d.data().status === 'ativo').length;
+      document.getElementById('qtdAlunos').textContent = ativos;
 
-    // Alunos
-    const alSnap = await db.collection('students').where('ownerId', '==', user.uid).get();
-    const ativos = alSnap.docs.filter(d => d.data().status === 'ativo').length;
-    document.getElementById('qtdAlunos').textContent = ativos;
+      const recSnap = await db.collection('financialRecords').where('ownerId', '==', user.uid).get();
+      const desSnap = await db.collection('expenses').where('ownerId', '==', user.uid).get();
 
-    // Financeiro do mês
-    const recSnap = await db.collection('financialRecords').where('ownerId', '==', user.uid).get();
-    const desSnap = await db.collection('expenses').where('ownerId', '==', user.uid).get();
+      let recebido = 0, pendente = 0, despesas = 0;
+      recSnap.forEach(d => {
+        const r = d.data();
+        if ((r.data || '').startsWith(mesAtual)) {
+          if (r.status === 'recebido') recebido += Number(r.valor || 0);
+          if (r.status === 'pendente') pendente += Number(r.valor || 0);
+        }
+      });
+      desSnap.forEach(d => {
+        const e = d.data();
+        if ((e.data || '').startsWith(mesAtual)) despesas += Number(e.valor || 0);
+      });
 
-    let recebido = 0, pendente = 0, despesas = 0;
-    recSnap.forEach(d => {
-      const r = d.data();
-      if ((r.data || '').startsWith(mesAtual)) {
-        if (r.status === 'recebido') recebido += Number(r.valor || 0);
-        if (r.status === 'pendente') pendente += Number(r.valor || 0);
+      document.getElementById('dashReceitas').textContent = fmt(recebido);
+      document.getElementById('dashPendentes').textContent = fmt(pendente);
+      document.getElementById('dashDespesas').textContent = fmt(despesas);
+
+      const agSnap = await db.collection('appointments').where('ownerId', '==', user.uid).get();
+      const alunosMap = {};
+      alSnap.forEach(d => alunosMap[d.id] = d.data().nome);
+
+      const hojeStr = hoje.toISOString().slice(0, 10);
+      const proximos = agSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .filter(a => a.data >= hojeStr && ['agendado', 'confirmado'].includes(a.status))
+        .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
+        .slice(0, 5);
+
+      const ul = document.getElementById('proximosAtendimentos');
+      if (proximos.length === 0) {
+        ul.innerHTML = '<li style="color:#8A6A72;">Nenhum atendimento agendado.</li>';
+      } else {
+        ul.innerHTML = proximos.map(a => {
+          const d = new Date(a.data + 'T' + a.hora).toLocaleString('pt-BR',
+            { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+          return `<li style="padding:10px 0; border-bottom:1px solid #F5E3E7;">
+            <strong>${d}</strong> — ${alunosMap[a.alunoId] || '(aluno removido)'}
+            <span style="color:#8A6A72;">(${a.status})</span>
+          </li>`;
+        }).join('');
       }
     });
-    desSnap.forEach(d => {
-      const e = d.data();
-      if ((e.data || '').startsWith(mesAtual)) despesas += Number(e.valor || 0);
-    });
-
-    document.getElementById('dashReceitas').textContent = fmt(recebido);
-    document.getElementById('dashPendentes').textContent = fmt(pendente);
-    document.getElementById('dashDespesas').textContent = fmt(despesas);
-
-    // Próximos atendimentos
-    const agSnap = await db.collection('appointments').where('ownerId', '==', user.uid).get();
-    const alunosMap = {};
-    alSnap.forEach(d => alunosMap[d.id] = d.data().nome);
-
-    const hojeStr = hoje.toISOString().slice(0, 10);
-    const proximos = agSnap.docs.map(d => ({ id: d.id, ...d.data() }))
-      .filter(a => a.data >= hojeStr && ['agendado', 'confirmado'].includes(a.status))
-      .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
-      .slice(0, 5);
-
-    const ul = document.getElementById('proximosAtendimentos');
-    if (proximos.length === 0) {
-      ul.innerHTML = '<li style="color:#6B6B6B;">Nenhum atendimento agendado.</li>';
-    } else {
-      ul.innerHTML = proximos.map(a => {
-        const d = new Date(a.data + 'T' + a.hora).toLocaleString('pt-BR',
-          { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-        return `<li style="padding:8px 0; border-bottom:1px solid #EAE5D9;">
-          <strong>${d}</strong> — ${alunosMap[a.alunoId] || '(aluno removido)'} <span style="color:#6B6B6B;">(${a.status})</span>
-        </li>`;
-      }).join('');
-    }
-  });
-</script>
+  </script>
 </body>
 </html>
