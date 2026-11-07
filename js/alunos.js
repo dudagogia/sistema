@@ -1,6 +1,7 @@
 // js/alunos.js
+// ATENÇÃO: não referencie 'btnSair' aqui. O menu.js cuida do botão Sair.
+
 protegerPagina();
-document.getElementById('btnSair').addEventListener('click', fazerLogout);
 
 let usuarioAtual = null;
 let alunosCache = [];
@@ -12,10 +13,12 @@ auth.onAuthStateChanged(async (user) => {
   await carregarDocumentos();
 });
 
-// ---------- ALUNOS ----------
+// ================= ALUNOS =================
 async function carregarAlunos() {
   const tbody = document.getElementById('listaAlunos');
   const select = document.getElementById('docAluno');
+  if (!tbody || !select) return;
+
   try {
     const snap = await db.collection('students')
       .where('ownerId', '==', usuarioAtual.uid)
@@ -25,23 +28,24 @@ async function carregarAlunos() {
     snap.forEach(doc => alunosCache.push({ id: doc.id, ...doc.data() }));
 
     if (alunosCache.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6B6B6B;">Nenhum aluno cadastrado.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#8A6A72;">Nenhum aluno cadastrado.</td></tr>';
     } else {
       tbody.innerHTML = alunosCache.map(a => `
         <tr>
-          <td>${a.nome}</td>
-          <td>${a.status}</td>
+          <td>${a.nome || '—'}</td>
+          <td>${a.status || '—'}</td>
           <td>${a.escola || '—'}</td>
           <td><button class="secundario" onclick="excluirAluno('${a.id}')">Excluir</button></td>
         </tr>
       `).join('');
     }
 
-    // Preenche o select de documentos
-    select.innerHTML = alunosCache.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+    select.innerHTML = alunosCache.map(a =>
+      `<option value="${a.id}">${a.nome || '(sem nome)'}</option>`
+    ).join('');
   } catch (e) {
-    console.error(e);
-    tbody.innerHTML = '<tr><td colspan="4" style="color:#B23A48;">Erro ao carregar.</td></tr>';
+    console.error('Erro ao carregar alunos:', e);
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#C9556B;">Erro ao carregar.</td></tr>';
   }
 }
 
@@ -74,7 +78,7 @@ document.getElementById('btnSalvar').addEventListener('click', async () => {
     document.getElementById('responsavel').value = '';
     await carregarAlunos();
   } catch (e) {
-    console.error(e);
+    console.error('Erro ao salvar aluno:', e);
     msg.className = 'msg erro';
     msg.textContent = 'Erro ao salvar. Verifique as regras do Firestore.';
   }
@@ -91,7 +95,7 @@ async function excluirAluno(id) {
   }
 }
 
-// ---------- DOCUMENTOS ----------
+// ================= DOCUMENTOS =================
 document.getElementById('btnSalvarDoc').addEventListener('click', async () => {
   const msg = document.getElementById('msgDoc');
   const alunoId = document.getElementById('docAluno').value;
@@ -104,7 +108,9 @@ document.getElementById('btnSalvarDoc').addEventListener('click', async () => {
     msg.textContent = 'Preencha aluno, nome do documento e link.';
     return;
   }
-  if (!url.startsWith('https://drive.google.com/') && !url.startsWith('https://1drv.ms/') && !url.startsWith('https://onedrive.live.com/')) {
+  if (!url.startsWith('https://drive.google.com/') &&
+      !url.startsWith('https://1drv.ms/') &&
+      !url.startsWith('https://onedrive.live.com/')) {
     msg.className = 'msg erro';
     msg.textContent = 'O link deve ser do Google Drive ou OneDrive.';
     return;
@@ -125,7 +131,7 @@ document.getElementById('btnSalvarDoc').addEventListener('click', async () => {
     document.getElementById('docUrl').value = '';
     await carregarDocumentos();
   } catch (e) {
-    console.error(e);
+    console.error('Erro ao salvar documento:', e);
     msg.className = 'msg erro';
     msg.textContent = 'Erro ao salvar documento.';
   }
@@ -133,6 +139,8 @@ document.getElementById('btnSalvarDoc').addEventListener('click', async () => {
 
 async function carregarDocumentos() {
   const tbody = document.getElementById('listaDocs');
+  if (!tbody) return;
+
   try {
     const snap = await db.collection('documents')
       .where('ownerId', '==', usuarioAtual.uid)
@@ -142,7 +150,7 @@ async function carregarDocumentos() {
     snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
 
     if (docs.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#6B6B6B;">Nenhum documento.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8A6A72;">Nenhum documento.</td></tr>';
       return;
     }
 
@@ -152,16 +160,16 @@ async function carregarDocumentos() {
       return `
         <tr>
           <td>${nomeAluno}</td>
-          <td>${d.nome}</td>
-          <td>${d.categoria}</td>
+          <td>${d.nome || '—'}</td>
+          <td>${d.categoria || '—'}</td>
           <td><a href="${d.url}" target="_blank" rel="noopener">Abrir</a></td>
           <td><button class="secundario" onclick="excluirDoc('${d.id}')">Excluir</button></td>
         </tr>
       `;
     }).join('');
   } catch (e) {
-    console.error(e);
-    tbody.innerHTML = '<tr><td colspan="5" style="color:#B23A48;">Erro ao carregar documentos.</td></tr>';
+    console.error('Erro ao carregar documentos:', e);
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#C9556B;">Erro ao carregar documentos.</td></tr>';
   }
 }
 
