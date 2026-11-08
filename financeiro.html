@@ -5,54 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Financeiro — Meu Espaço Psicopedagógico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div id="app-header"></div>
+  <div id="app-header"></div>
 
   <div class="container">
-    <!-- Resumo do mês -->
     <div class="card">
       <h2>Resumo do mês</h2>
       <div style="display:flex; gap:16px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:140px;">
-          <p style="color:#6B6B6B; font-size:0.85rem;">Receitas recebidas</p>
-          <p style="font-size:1.6rem; color:#3E7C4F; font-weight:600;" id="resReceitas">R$ 0,00</p>
-        </div>
-        <div style="flex:1; min-width:140px;">
-          <p style="color:#6B6B6B; font-size:0.85rem;">Pendentes</p>
-          <p style="font-size:1.6rem; color:#C9A227; font-weight:600;" id="resPendentes">R$ 0,00</p>
-        </div>
-        <div style="flex:1; min-width:140px;">
-          <p style="color:#6B6B6B; font-size:0.85rem;">Despesas</p>
-          <p style="font-size:1.6rem; color:#B23A48; font-weight:600;" id="resDespesas">R$ 0,00</p>
-        </div>
-        <div style="flex:1; min-width:140px;">
-          <p style="color:#6B6B6B; font-size:0.85rem;">Saldo</p>
-          <p style="font-size:1.6rem; color:#1F4E5F; font-weight:600;" id="resSaldo">R$ 0,00</p>
-        </div>
+        <div class="indicador"><p>Receitas recebidas</p><p style="color:#6FA97A;" id="resReceitas">R$ 0,00</p></div>
+        <div class="indicador"><p>Pendentes</p><p style="color:#E0A96D;" id="resPendentes">R$ 0,00</p></div>
+        <div class="indicador"><p>Despesas</p><p style="color:#C9556B;" id="resDespesas">R$ 0,00</p></div>
+        <div class="indicador"><p>Saldo</p><p style="color:#9C4258;" id="resSaldo">R$ 0,00</p></div>
       </div>
       <label style="margin-top:16px;">Filtrar por mês</label>
       <input id="filtroMes" type="month" />
     </div>
 
-    <!-- Nova receita -->
     <div class="card">
       <h2>Registrar receita</h2>
       <label>Aluno</label>
       <select id="recAluno"></select>
-
       <label>Descrição</label>
       <input id="recDesc" type="text" placeholder="Ex: Sessão avulsa, Pacote mensal" />
-
       <label>Valor (R$)</label>
       <input id="recValor" type="number" step="0.01" min="0" placeholder="0,00" />
-
       <label>Data</label>
       <input id="recData" type="date" />
-
       <label>Forma de pagamento</label>
       <select id="recForma">
         <option value="pix">PIX</option>
@@ -61,23 +43,19 @@
         <option value="transferencia">Transferência</option>
         <option value="outro">Outro</option>
       </select>
-
       <label>Status</label>
       <select id="recStatus">
         <option value="recebido">Recebido</option>
         <option value="pendente">Pendente</option>
       </select>
-
       <button class="primary" id="btnSalvarReceita">Salvar receita</button>
       <div id="msgReceita" class="msg"></div>
     </div>
 
-    <!-- Nova despesa -->
     <div class="card">
       <h2>Registrar despesa</h2>
       <label>Descrição</label>
       <input id="desDesc" type="text" placeholder="Ex: Impressão, jogo pedagógico" />
-
       <label>Categoria</label>
       <select id="desCategoria">
         <option value="material">Material pedagógico</option>
@@ -87,18 +65,14 @@
         <option value="transporte">Transporte</option>
         <option value="outro">Outro</option>
       </select>
-
       <label>Valor (R$)</label>
       <input id="desValor" type="number" step="0.01" min="0" placeholder="0,00" />
-
       <label>Data</label>
       <input id="desData" type="date" />
-
       <button class="primary" id="btnSalvarDespesa">Salvar despesa</button>
       <div id="msgDespesa" class="msg"></div>
     </div>
 
-    <!-- Lançamentos -->
     <div class="card">
       <h2>Lançamentos</h2>
       <table>
@@ -106,7 +80,7 @@
           <tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Aluno</th><th>Valor</th><th>Status</th><th>Ações</th></tr>
         </thead>
         <tbody id="listaLanc">
-          <tr><td colspan="7" style="text-align:center; color:#6B6B6B;">Carregando...</td></tr>
+          <tr><td colspan="7" style="text-align:center; color:#8A6A72;">Carregando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -117,7 +91,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
-<script src="js/menu.js"></script>
+  <script src="js/menu.js"></script>
   <script src="js/financeiro.js"></script>
 </body>
 </html>

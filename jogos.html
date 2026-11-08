@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogos — Meu Espaço Psicopedagógico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/jogos.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <div class="container">
+    <!-- Seletor de jogo -->
+    <div class="card no-print">
+      <h2>Escolha um jogo</h2>
+      <div class="jogos-seletor">
+        <button class="jogo-btn ativo" data-jogo="memoria">
+          <span class="jogo-emoji">🧠</span>
+          <span>Jogo da Memória</span>
+        </button>
+        <button class="jogo-btn" data-jogo="palavras">
+          <span class="jogo-emoji">🔤</span>
+          <span>Formação de Palavras</span>
+        </button>
+        <button class="jogo-btn" data-jogo="caca">
+          <span class="jogo-emoji">🔍</span>
+          <span>Caça-palavras</span>
+        </button>
+      </div>
+
+      <div class="jogo-controles">
+        <div>
+          <label>Aluno (opcional)</label>
+          <select id="jogoAluno"><option value="">—</option></select>
+        </div>
+        <div>
+          <label>Nível</label>
+          <select id="jogoNivel">
+            <option value="facil">Fácil</option>
+            <option value="medio" selected>Médio</option>
+            <option value="dificil">Difícil</option>
+          </select>
+        </div>
+        <div>
+          <label>Tema (memória)</label>
+          <select id="jogoTema">
+            <option value="animais">Animais</option>
+            <option value="letras">Letras</option>
+            <option value="numeros">Números</option>
+            <option value="frutas">Frutas</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="primary" id="btnIniciar">Iniciar jogo</button>
+      <div id="msgJogo" class="msg"></div>
+    </div>
+
+    <!-- Área do jogo -->
+    <div class="card" id="areaJogo" style="display:none;">
+      <div class="jogo-topo">
+        <div>
+          <h2 id="jogoTitulo" style="margin:0;">Jogo</h2>
+          <p id="jogoStatus" style="color:#8A6A72; font-size:0.9rem; margin-top:4px;"></p>
+        </div>
+        <div class="jogo-botoes">
+          <button class="secundario" id="btnReiniciar">🔄 Reiniciar</button>
+          <button class="secundario" id="btnRegistrarJogo" style="display:none;">💾 Registrar desempenho</button>
+        </div>
+      </div>
+      <div id="jogoCanvas"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/jogos.js"></script>
+</body>
+</html>

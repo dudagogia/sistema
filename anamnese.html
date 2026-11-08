@@ -5,108 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Anamnese — Meu Espaço Psicopedagógico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div id="app-header"></div>
+  <div id="app-header"></div>
 
   <div class="container">
     <div class="card">
       <h2>Anamnese Psicopedagógica</h2>
-
       <label for="alunoSelect">Aluno</label>
       <select id="alunoSelect"><option value="">Carregando...</option></select>
-
-      <p style="font-size:0.85rem; color:#6B6B6B; margin-top:8px;">
+      <p style="font-size:0.85rem; color:#8A6A72; margin-top:8px;">
         Este formulário pode ser salvo parcialmente. Não gera diagnósticos automáticos.
       </p>
     </div>
 
     <form id="formAnamnese" style="display:none;">
-      <!-- Identificação -->
       <div class="card">
         <h2>1. Identificação</h2>
         <label>Quem preencheu / relação com a criança</label>
         <input name="quemPreencheu" type="text" />
-
         <label>Composição familiar</label>
         <textarea name="composicaoFamiliar" rows="3"></textarea>
-
         <label>Histórico gestacional e de nascimento (quando pertinente)</label>
         <textarea name="gestacao" rows="3"></textarea>
       </div>
 
-      <!-- Desenvolvimento -->
       <div class="card">
         <h2>2. Desenvolvimento</h2>
         <label>Desenvolvimento motor</label>
         <textarea name="desenvolvimentoMotor" rows="2"></textarea>
-
         <label>Desenvolvimento da linguagem</label>
         <textarea name="linguagem" rows="2"></textarea>
-
         <label>Desenvolvimento cognitivo</label>
         <textarea name="cognitivo" rows="2"></textarea>
-
         <label>Desenvolvimento socioemocional</label>
         <textarea name="socioemocional" rows="2"></textarea>
       </div>
 
-      <!-- Saúde e escola -->
       <div class="card">
         <h2>3. Saúde e escola</h2>
         <label>Histórico de saúde informado pela família</label>
         <textarea name="saude" rows="2"></textarea>
-
         <label>Histórico escolar</label>
         <textarea name="historicoEscolar" rows="2"></textarea>
-
         <label>Alfabetização</label>
         <textarea name="alfabetizacao" rows="2"></textarea>
       </div>
 
-      <!-- Aprendizagem -->
       <div class="card">
         <h2>4. Aprendizagem</h2>
         <label>Leitura</label>
         <textarea name="leitura" rows="2"></textarea>
-
         <label>Escrita</label>
         <textarea name="escrita" rows="2"></textarea>
-
         <label>Matemática</label>
         <textarea name="matematica" rows="2"></textarea>
-
         <label>Atenção e concentração</label>
         <textarea name="atencao" rows="2"></textarea>
-
         <label>Memória</label>
         <textarea name="memoria" rows="2"></textarea>
-
         <label>Organização e autonomia</label>
         <textarea name="organizacao" rows="2"></textarea>
       </div>
 
-      <!-- Social e rotina -->
       <div class="card">
         <h2>5. Social e rotina</h2>
         <label>Relacionamento social</label>
         <textarea name="social" rows="2"></textarea>
-
         <label>Hábitos e rotina</label>
         <textarea name="rotina" rows="2"></textarea>
-
         <label>Preferências e interesses</label>
         <textarea name="interesses" rows="2"></textarea>
-
         <label>Dificuldades percebidas pelos responsáveis</label>
         <textarea name="dificuldades" rows="2"></textarea>
-
         <label>Expectativas da família</label>
         <textarea name="expectativas" rows="2"></textarea>
-
         <label>Observações</label>
         <textarea name="observacoes" rows="2"></textarea>
       </div>
@@ -114,7 +90,7 @@
       <div class="card">
         <button type="button" class="primary" id="btnSalvarAnamnese">Salvar anamnese</button>
         <div id="msgAnamnese" class="msg"></div>
-        <p id="statusAnamnese" style="font-size:0.8rem; color:#6B6B6B; margin-top:8px;"></p>
+        <p id="statusAnamnese" style="font-size:0.8rem; color:#8A6A72; margin-top:8px;"></p>
       </div>
     </form>
   </div>
@@ -124,7 +100,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
-<script src="js/menu.js"></script>
+  <script src="js/menu.js"></script>
   <script src="js/anamnese.js"></script>
 </body>
 </html>

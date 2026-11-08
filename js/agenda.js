@@ -1,6 +1,5 @@
 // js/agenda.js
 protegerPagina();
-document.getElementById('btnSair').addEventListener('click', fazerLogout);
 
 let usuarioAtual = null;
 let alunosCache = [];
@@ -14,10 +13,17 @@ auth.onAuthStateChanged(async (user) => {
 
 async function carregarAlunos() {
   const select = document.getElementById('agAluno');
-  const snap = await db.collection('students')
-    .where('ownerId', '==', usuarioAtual.uid).get();
-  alunosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  select.innerHTML = alunosCache.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+  if (!select) return;
+  try {
+    const snap = await db.collection('students')
+      .where('ownerId', '==', usuarioAtual.uid).get();
+    alunosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    select.innerHTML = alunosCache.map(a =>
+      `<option value="${a.id}">${a.nome}</option>`
+    ).join('');
+  } catch (e) {
+    console.error('Erro ao carregar alunos:', e);
+  }
 }
 
 document.getElementById('btnSalvarAg').addEventListener('click', async () => {
@@ -57,6 +63,7 @@ document.getElementById('btnSalvarAg').addEventListener('click', async () => {
 
 async function carregarAgenda() {
   const tbody = document.getElementById('listaAgenda');
+  if (!tbody) return;
   try {
     const snap = await db.collection('appointments')
       .where('ownerId', '==', usuarioAtual.uid).get();
@@ -65,7 +72,7 @@ async function carregarAgenda() {
       .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
 
     if (lista.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#6B6B6B;">Nenhum atendimento agendado.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8A6A72;">Nenhum atendimento agendado.</td></tr>';
       return;
     }
 
@@ -91,7 +98,7 @@ async function carregarAgenda() {
     }).join('');
   } catch (e) {
     console.error(e);
-    tbody.innerHTML = '<tr><td colspan="5" style="color:#B23A48;">Erro ao carregar agenda.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#C9556B;">Erro ao carregar agenda.</td></tr>';
   }
 }
 

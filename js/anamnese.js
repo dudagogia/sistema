@@ -1,6 +1,5 @@
 // js/anamnese.js
 protegerPagina();
-document.getElementById('btnSair').addEventListener('click', fazerLogout);
 
 let usuarioAtual = null;
 let anamneseAtualId = null;
@@ -13,25 +12,31 @@ auth.onAuthStateChanged(async (user) => {
 
 async function carregarAlunos() {
   const select = document.getElementById('alunoSelect');
-  const snap = await db.collection('students')
-    .where('ownerId', '==', usuarioAtual.uid).get();
+  if (!select) return;
 
-  if (snap.empty) {
-    select.innerHTML = '<option value="">Nenhum aluno cadastrado</option>';
-    return;
-  }
+  try {
+    const snap = await db.collection('students')
+      .where('ownerId', '==', usuarioAtual.uid).get();
 
-  select.innerHTML = '<option value="">Selecione um aluno</option>' +
-    snap.docs.map(d => `<option value="${d.id}">${d.data().nome}</option>`).join('');
-
-  select.addEventListener('change', async () => {
-    const alunoId = select.value;
-    if (!alunoId) {
-      document.getElementById('formAnamnese').style.display = 'none';
+    if (snap.empty) {
+      select.innerHTML = '<option value="">Nenhum aluno cadastrado</option>';
       return;
     }
-    await carregarAnamnese(alunoId);
-  });
+
+    select.innerHTML = '<option value="">Selecione um aluno</option>' +
+      snap.docs.map(d => `<option value="${d.id}">${d.data().nome}</option>`).join('');
+
+    select.addEventListener('change', async () => {
+      const alunoId = select.value;
+      if (!alunoId) {
+        document.getElementById('formAnamnese').style.display = 'none';
+        return;
+      }
+      await carregarAnamnese(alunoId);
+    });
+  } catch (e) {
+    console.error('Erro ao carregar alunos:', e);
+  }
 }
 
 async function carregarAnamnese(alunoId) {
@@ -41,22 +46,26 @@ async function carregarAnamnese(alunoId) {
   form.reset();
   anamneseAtualId = null;
 
-  const snap = await db.collection('anamneses')
-    .where('ownerId', '==', usuarioAtual.uid)
-    .where('alunoId', '==', alunoId)
-    .limit(1).get();
+  try {
+    const snap = await db.collection('anamneses')
+      .where('ownerId', '==', usuarioAtual.uid)
+      .where('alunoId', '==', alunoId)
+      .limit(1).get();
 
-  if (!snap.empty) {
-    const doc = snap.docs[0];
-    anamneseAtualId = doc.id;
-    const dados = doc.data();
-    Object.keys(dados).forEach(k => {
-      const campo = form.elements[k];
-      if (campo) campo.value = dados[k] || '';
-    });
-    status.textContent = 'Anamnese já existente. Edite e salve para atualizar.';
-  } else {
-    status.textContent = 'Nenhuma anamnese cadastrada. Preencha e salve.';
+    if (!snap.empty) {
+      const doc = snap.docs[0];
+      anamneseAtualId = doc.id;
+      const dados = doc.data();
+      Object.keys(dados).forEach(k => {
+        const campo = form.elements[k];
+        if (campo) campo.value = dados[k] || '';
+      });
+      status.textContent = 'Anamnese já existente. Edite e salve para atualizar.';
+    } else {
+      status.textContent = 'Nenhuma anamnese cadastrada. Preencha e salve.';
+    }
+  } catch (e) {
+    console.error('Erro ao carregar anamnese:', e);
   }
 }
 
@@ -66,7 +75,11 @@ document.getElementById('btnSalvarAnamnese').addEventListener('click', async () 
   if (!alunoId) return;
 
   const form = document.getElementById('formAnamnese');
-  const dados = { alunoId, ownerId: usuarioAtual.uid, atualizadoEm: firebase.firestore.FieldValue.serverTimestamp() };
+  const dados = {
+    alunoId,
+    ownerId: usuarioAtual.uid,
+    atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+  };
 
   Array.from(form.elements).forEach(el => {
     if (el.name) dados[el.name] = el.value.trim();

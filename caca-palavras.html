@@ -5,77 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Caça-palavras — Meu Espaço Psicopedagógico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    .cp-toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
-    .cp-toolbar > div { flex:1; min-width:120px; }
-
-    .grade-wrap {
-      display:inline-block;
-      background:#fff;
-      padding:16px;
-      border:1px solid #D9D3C5;
-      border-radius:8px;
-      margin-top:16px;
-    }
-    table.grade { border-collapse:collapse; }
-    table.grade td {
-      width:32px; height:32px;
-      text-align:center; vertical-align:middle;
-      font-family:'Courier New', monospace;
-      font-size:1rem; font-weight:600;
-      color:#2B2B2B;
-      border:1px solid #EAE5D9;
-    }
-
-    .lista-palavras {
-      margin-top:16px;
-      display:flex; flex-wrap:wrap; gap:8px;
-    }
-    .lista-palavras span {
-      background:#F5F0E6;
-      padding:4px 10px;
-      border-radius:12px;
-      font-size:0.85rem;
-      color:#1F4E5F;
-    }
-
-    .ficha-cp {
-      background:#fff;
-      border:1px solid #D9D3C5;
-      border-radius:8px;
-      padding:28px;
-      margin-top:16px;
-      font-family: Georgia, serif;
-    }
-    .ficha-cp h1 { font-size:1.25rem; color:#1F4E5F; }
-    .ficha-cp .meta { font-size:0.9rem; color:#6B6B6B; margin-bottom:16px; }
-    .ficha-cp .cabecalho { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; font-size:0.9rem; }
-    .ficha-cp .cabecalho div { flex:1; min-width:160px; }
-
-    @media print {
-      header, .no-print { display:none !important; }
-      .container { padding:0; max-width:100%; }
-      .ficha-cp { border:none; padding:0; page-break-inside:avoid; }
-      body { background:#fff; }
-    }
-  </style>
 </head>
 <body>
-<div id="app-header"></div>
+  <div id="app-header"></div>
 
   <div class="container">
     <div class="card no-print">
       <h2>Gerar caça-palavras</h2>
 
-      <div class="cp-toolbar">
-        <div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:1; min-width:120px;">
           <label>Aluno (opcional)</label>
           <select id="cpAluno"><option value="">—</option></select>
         </div>
-        <div>
+        <div style="flex:1; min-width:120px;">
           <label>Tamanho da grade</label>
           <select id="cpTamanho">
             <option value="10">10 x 10</option>
@@ -83,7 +29,7 @@
             <option value="15">15 x 15</option>
           </select>
         </div>
-        <div>
+        <div style="flex:1; min-width:120px;">
           <label>Direções</label>
           <select id="cpDirecoes">
             <option value="h">Horizontal</option>
@@ -114,7 +60,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
-<script src="js/menu.js"></script>
+  <script src="js/menu.js"></script>
   <script src="js/caca-palavras.js"></script>
 </body>
 </html>

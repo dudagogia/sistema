@@ -5,29 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Atividades — Meu Espaço Psicopedagógico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    .grid-atividades { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:16px; }
-    .ativ-card { background:#FDFBF6; border:1px solid #EAE5D9; border-radius:10px; padding:14px; position:relative; }
-    .ativ-card h4 { color:#1F4E5F; margin-bottom:6px; font-size:0.95rem; }
-    .ativ-card .tag { display:inline-block; background:#C9C3E6; color:#2B2B2B; font-size:0.72rem; padding:2px 8px; border-radius:10px; margin:2px 2px 0 0; }
-    .ativ-card .fav { position:absolute; top:10px; right:10px; background:none; border:none; cursor:pointer; font-size:1.2rem; }
-    .ativ-card .acoes { margin-top:10px; display:flex; gap:6px; }
-    .ativ-card .acoes button { font-size:0.75rem; padding:4px 8px; }
-    .filtros { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
-    .filtros input, .filtros select { flex:1; min-width:130px; }
-    .detalhe { background:#fff; border-left:4px solid #C9A227; padding:14px; margin-top:10px; font-size:0.9rem; line-height:1.6; }
-  </style>
 </head>
 <body>
-<div id="app-header"></div>
+  <div id="app-header"></div>
 
   <div class="container">
-    <!-- Cadastro -->
     <div class="card">
       <h2>Cadastrar nova atividade</h2>
+
       <label>Nome da atividade</label>
       <input id="ativNome" type="text" placeholder="Ex: Caça-sílabas iniciais" />
 
@@ -83,7 +71,6 @@
       <div id="msgAtiv" class="msg"></div>
     </div>
 
-    <!-- Filtros e lista -->
     <div class="card">
       <h2>Biblioteca</h2>
       <div class="filtros">
@@ -113,7 +100,7 @@
         </select>
       </div>
       <div id="listaAtiv" class="grid-atividades">
-        <p style="color:#6B6B6B;">Carregando...</p>
+        <p style="color:#8A6A72;">Carregando...</p>
       </div>
     </div>
   </div>
@@ -123,7 +110,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth.js"></script>
-<script src="js/menu.js"></script>
+  <script src="js/menu.js"></script>
   <script src="js/atividades.js"></script>
 </body>
 </html>

@@ -1,6 +1,5 @@
 // js/caca-palavras.js
 protegerPagina();
-document.getElementById('btnSair').addEventListener('click', fazerLogout);
 
 let usuarioAtual = null;
 let alunosCache = [];
@@ -8,27 +7,31 @@ let alunosCache = [];
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
   usuarioAtual = user;
-  const snap = await db.collection('students')
-    .where('ownerId', '==', user.uid).get();
-  alunosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  try {
+    const snap = await db.collection('students')
+      .where('ownerId', '==', user.uid).get();
+    alunosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  const sel = document.getElementById('cpAluno');
-  sel.innerHTML = '<option value="">—</option>' +
-    alunosCache.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+    const sel = document.getElementById('cpAluno');
+    if (sel) {
+      sel.innerHTML = '<option value="">—</option>' +
+        alunosCache.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+    }
+  } catch (e) {
+    console.error('Erro ao carregar alunos:', e);
+  }
 });
-
-// ============ GERAÇÃO DA GRADE ============
 
 function normalizar(s) {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z]/g, '');
 }
 
 function direcoesPermitidas(modo) {
-  const base = [[0, 1]]; // horizontal
-  if (modo === 'hv' || modo === 'hvd') base.push([1, 0]); // vertical
+  const base = [[0, 1]];
+  if (modo === 'hv' || modo === 'hvd') base.push([1, 0]);
   if (modo === 'hvd') {
-    base.push([1, 1]);  // diagonal desc
-    base.push([1, -1]); // diagonal asc
+    base.push([1, 1]);
+    base.push([1, -1]);
   }
   return base;
 }
@@ -43,8 +46,8 @@ function tentarPosicionar(grade, palavra, dirs) {
     const maxY = dy === 0 ? n : dy > 0 ? n - palavra.length : n - 1;
     if (maxX < 0 || maxY < 0) continue;
 
-    const x0 = Math.floor(Math.random() * (dx >= 0 ? maxX + 1 : maxX + 1));
-    const y0 = Math.floor(Math.random() * (dy >= 0 ? maxY + 1 : maxY + 1));
+    const x0 = Math.floor(Math.random() * (maxX + 1));
+    const y0 = Math.floor(Math.random() * (maxY + 1));
 
     let ok = true;
     for (let i = 0; i < palavra.length; i++) {
@@ -53,7 +56,6 @@ function tentarPosicionar(grade, palavra, dirs) {
       if (x < 0 || y < 0 || x >= n || y >= n) { ok = false; break; }
       if (grade[x][y] && grade[x][y] !== palavra[i]) { ok = false; break; }
     }
-
     if (!ok) continue;
 
     for (let i = 0; i < palavra.length; i++) {
@@ -70,7 +72,6 @@ function gerarGrade(palavras, tamanho, modoDirecoes) {
   const colocadas = [];
   const naoColocadas = [];
 
-  // Ordena do maior para o menor (mais fácil posicionar)
   const ordenadas = [...palavras].sort((a, b) => b.length - a.length);
 
   for (const p of ordenadas) {
@@ -79,7 +80,6 @@ function gerarGrade(palavras, tamanho, modoDirecoes) {
     else naoColocadas.push(p);
   }
 
-  // Preenche vazios com letras aleatórias
   const alfabeto = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   for (let i = 0; i < tamanho; i++) {
     for (let j = 0; j < tamanho; j++) {
@@ -89,8 +89,6 @@ function gerarGrade(palavras, tamanho, modoDirecoes) {
 
   return { grade, colocadas, naoColocadas };
 }
-
-// ============ RENDERIZAÇÃO ============
 
 document.getElementById('btnGerarCP').addEventListener('click', () => {
   const msg = document.getElementById('msgCP');
@@ -115,17 +113,15 @@ document.getElementById('btnGerarCP').addEventListener('click', () => {
   const tamanho = Number(document.getElementById('cpTamanho').value);
   const modo = document.getElementById('cpDirecoes').value;
 
-  // Verifica se as palavras cabem
   const maior = Math.max(...palavras.map(p => p.length));
   if (maior > tamanho) {
     msg.className = 'msg erro';
-    msg.textContent = `A palavra mais longa tem ${maior} letras, mas a grade é ${tamanho}. Aumente a grade ou reduza a palavra.`;
+    msg.textContent = `A palavra mais longa tem ${maior} letras, mas a grade é ${tamanho}.`;
     return;
   }
 
   const { grade, colocadas, naoColocadas } = gerarGrade(palavras, tamanho, modo);
 
-  // Monta HTML
   const alunoId = document.getElementById('cpAluno').value;
   const aluno = alunosCache.find(a => a.id === alunoId);
   const titulo = document.getElementById('cpTitulo').value.trim() || 'Caça-palavras';
@@ -147,7 +143,7 @@ document.getElementById('btnGerarCP').addEventListener('click', () => {
     <h1>Meu Espaço Psicopedagógico</h1>
     <p class="meta">${titulo}</p>
 
-    <div class="cabecalho">
+    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; font-size:0.9rem;">
       <div><strong>Aluno:</strong> ${aluno ? aluno.nome : '_______________________'}</div>
       <div><strong>Data:</strong> ${hoje}</div>
     </div>
@@ -157,7 +153,7 @@ document.getElementById('btnGerarCP').addEventListener('click', () => {
 
     <div class="grade-wrap" style="margin-top:16px;">${tabelaHtml}</div>
 
-    ${naoColocadas.length ? `<p style="margin-top:16px; font-size:0.8rem; color:#B23A48;">Não couberam na grade: ${naoColocadas.join(', ')}</p>` : ''}
+    ${naoColocadas.length ? `<p style="margin-top:16px; font-size:0.8rem; color:#C9556B;">Não couberam na grade: ${naoColocadas.join(', ')}</p>` : ''}
   `;
 
   document.getElementById('cpFicha').innerHTML = ficha;
@@ -168,11 +164,9 @@ document.getElementById('btnGerarCP').addEventListener('click', () => {
   msg.textContent = `Grade gerada com ${colocadas.length} palavra(s).`;
 });
 
-// ============ IMPRESSÃO ============
-
 document.getElementById('btnImprimirCP').addEventListener('click', () => {
-  if (document.getElementById('cpCard').style.display === 'none' ||
-      !document.getElementById('cpCard').style.display) {
+  const card = document.getElementById('cpCard');
+  if (!card.style.display || card.style.display === 'none') {
     alert('Gere o caça-palavras primeiro.');
     return;
   }

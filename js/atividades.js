@@ -1,6 +1,5 @@
 // js/atividades.js
 protegerPagina();
-document.getElementById('btnSair').addEventListener('click', fazerLogout);
 
 let usuarioAtual = null;
 let atividadesCache = [];
@@ -11,7 +10,6 @@ auth.onAuthStateChanged(async (user) => {
   await carregarAtividades();
 });
 
-// ---------- SALVAR ----------
 document.getElementById('btnSalvarAtiv').addEventListener('click', async () => {
   const msg = document.getElementById('msgAtiv');
   const nome = document.getElementById('ativNome').value.trim();
@@ -43,15 +41,8 @@ document.getElementById('btnSalvarAtiv').addEventListener('click', async () => {
     await db.collection('activities').add(ativ);
     msg.className = 'msg sucesso';
     msg.textContent = 'Atividade salva.';
-    document.getElementById('ativNome').value = '';
-    document.getElementById('ativHabilidade').value = '';
-    document.getElementById('ativObjetivo').value = '';
-    document.getElementById('ativIdade').value = '';
-    document.getElementById('ativMateriais').value = '';
-    document.getElementById('ativInstrucoes').value = '';
-    document.getElementById('ativAplicar').value = '';
-    document.getElementById('ativObservar').value = '';
-    document.getElementById('ativAdaptacoes').value = '';
+    ['ativNome','ativHabilidade','ativObjetivo','ativIdade','ativMateriais','ativInstrucoes','ativAplicar','ativObservar','ativAdaptacoes']
+      .forEach(id => document.getElementById(id).value = '');
     await carregarAtividades();
   } catch (e) {
     console.error(e);
@@ -60,16 +51,21 @@ document.getElementById('btnSalvarAtiv').addEventListener('click', async () => {
   }
 });
 
-// ---------- LISTAGEM ----------
 async function carregarAtividades() {
-  const snap = await db.collection('activities')
-    .where('ownerId', '==', usuarioAtual.uid).get();
-  atividadesCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderizar();
+  try {
+    const snap = await db.collection('activities')
+      .where('ownerId', '==', usuarioAtual.uid).get();
+    atividadesCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderizar();
+  } catch (e) {
+    console.error('Erro ao carregar atividades:', e);
+  }
 }
 
 function renderizar() {
   const div = document.getElementById('listaAtiv');
+  if (!div) return;
+
   const busca = document.getElementById('filtroBusca').value.toLowerCase();
   const area = document.getElementById('filtroArea').value;
   const dif = document.getElementById('filtroDificuldade').value;
@@ -77,13 +73,14 @@ function renderizar() {
 
   let lista = atividadesCache;
   if (busca) lista = lista.filter(a =>
-    (a.nome || '').toLowerCase().includes(busca) || (a.habilidade || '').toLowerCase().includes(busca));
+    (a.nome || '').toLowerCase().includes(busca) ||
+    (a.habilidade || '').toLowerCase().includes(busca));
   if (area) lista = lista.filter(a => a.area === area);
   if (dif) lista = lista.filter(a => a.dificuldade === dif);
   if (fav === 'sim') lista = lista.filter(a => a.favorita);
 
   if (lista.length === 0) {
-    div.innerHTML = '<p style="color:#6B6B6B;">Nenhuma atividade encontrada.</p>';
+    div.innerHTML = '<p style="color:#8A6A72;">Nenhuma atividade encontrada.</p>';
     return;
   }
 
@@ -97,7 +94,7 @@ function renderizar() {
       ${a.dificuldade ? `<span class="tag">${a.dificuldade}</span>` : ''}
       ${a.idade ? `<span class="tag">${a.idade}</span>` : ''}
       ${a.tempo ? `<span class="tag">${a.tempo}min</span>` : ''}
-      ${a.habilidade ? `<p style="font-size:0.8rem; color:#6B6B6B; margin-top:6px;">${a.habilidade}</p>` : ''}
+      ${a.habilidade ? `<p style="font-size:0.8rem; color:#8A6A72; margin-top:6px;">${a.habilidade}</p>` : ''}
       <div class="acoes">
         <button class="secundario" onclick="verDetalhe('${a.id}')">Ver</button>
         <button class="secundario" onclick="excluirAtiv('${a.id}')">Excluir</button>
@@ -107,13 +104,14 @@ function renderizar() {
   `).join('');
 }
 
-// Filtros ao vivo
 ['filtroBusca','filtroArea','filtroDificuldade','filtroFavoritas'].forEach(id => {
-  document.getElementById(id).addEventListener('input', renderizar);
-  document.getElementById(id).addEventListener('change', renderizar);
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('input', renderizar);
+    el.addEventListener('change', renderizar);
+  }
 });
 
-// ---------- AÇÕES ----------
 async function toggleFavorita(id, novo) {
   try {
     await db.collection('activities').doc(id).update({ favorita: novo });
@@ -126,7 +124,7 @@ async function toggleFavorita(id, novo) {
 function verDetalhe(id) {
   const a = atividadesCache.find(x => x.id === id);
   const el = document.getElementById('det-' + id);
-  if (!a) return;
+  if (!a || !el) return;
   if (el.innerHTML) { el.innerHTML = ''; return; }
 
   el.innerHTML = `

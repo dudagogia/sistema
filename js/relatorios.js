@@ -1,6 +1,5 @@
 // js/relatorios.js
 protegerPagina();
-document.getElementById('btnSair').addEventListener('click', fazerLogout);
 
 let usuarioAtual = null;
 let alunosCache = [];
@@ -8,13 +7,20 @@ let alunosCache = [];
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
   usuarioAtual = user;
-  const snap = await db.collection('students')
-    .where('ownerId', '==', usuarioAtual.uid).get();
-  alunosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  const select = document.getElementById('relAluno');
-  select.innerHTML = '<option value="">Selecione um aluno</option>' +
-    alunosCache.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+  try {
+    const snap = await db.collection('students')
+      .where('ownerId', '==', usuarioAtual.uid).get();
+    alunosCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    const select = document.getElementById('relAluno');
+    if (select) {
+      select.innerHTML = '<option value="">Selecione um aluno</option>' +
+        alunosCache.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+    }
+  } catch (e) {
+    console.error('Erro ao carregar alunos:', e);
+  }
 });
 
 document.getElementById('btnImprimir').addEventListener('click', () => window.print());
@@ -34,20 +40,17 @@ document.getElementById('btnGerar').addEventListener('click', async () => {
   if (!aluno) return;
 
   try {
-    // Buscar anamnese
     const anSnap = await db.collection('anamneses')
       .where('ownerId', '==', usuarioAtual.uid)
       .where('alunoId', '==', alunoId).limit(1).get();
     const anamnese = anSnap.empty ? null : anSnap.docs[0].data();
 
-    // Buscar evoluções
     const evSnap = await db.collection('evolutions')
       .where('ownerId', '==', usuarioAtual.uid)
       .where('alunoId', '==', alunoId).get();
     const evolucoes = evSnap.docs.map(d => d.data())
       .sort((a, b) => (a.data || '').localeCompare(b.data || ''));
 
-    // Montar conteúdo
     const titulos = {
       inicial: 'Relatório Inicial',
       acompanhamento: 'Relatório de Acompanhamento',
@@ -59,27 +62,26 @@ document.getElementById('btnGerar').addEventListener('click', async () => {
     const hoje = new Date().toLocaleDateString('pt-BR');
 
     let html = `
-      <h1 style="color:#1F4E5F; font-size:1.4rem; margin-bottom:4px;">Meu Espaço Psicopedagógico</h1>
-      <h2 style="font-size:1.1rem; color:#1F4E5F; margin-bottom:16px;">${titulos[tipo]}</h2>
+      <h1 style="color:#9C4258; font-size:1.4rem; margin-bottom:4px;">Meu Espaço Psicopedagógico</h1>
+      <h2 style="font-size:1.1rem; color:#9C4258; margin-bottom:16px;">${titulos[tipo]}</h2>
 
       <p><strong>Aluno:</strong> ${aluno.nome || '—'}</p>
       <p><strong>Data de nascimento:</strong> ${aluno.nascimento ? new Date(aluno.nascimento + 'T12:00').toLocaleDateString('pt-BR') : '—'}</p>
       <p><strong>Escola:</strong> ${aluno.escola || '—'}</p>
       <p><strong>Responsável:</strong> ${aluno.responsavel || '—'}</p>
       <p><strong>Data do relatório:</strong> ${hoje}</p>
-      <hr style="margin:16px 0; border:none; border-top:1px solid #EAE5D9;" />
+      <hr style="margin:16px 0; border:none; border-top:1px solid #F5E3E7;" />
     `;
 
     if (anamnese) {
-      html += `<h3 style="color:#1F4E5F; font-size:1rem; margin-top:16px;">Síntese da anamnese</h3>`;
+      html += `<h3 style="color:#9C4258; font-size:1rem; margin-top:16px;">Síntese da anamnese</h3>`;
       if (anamnese.dificuldades) html += `<p><strong>Dificuldades relatadas:</strong> ${anamnese.dificuldades}</p>`;
       if (anamnese.interesses) html += `<p><strong>Interesses:</strong> ${anamnese.interesses}</p>`;
       if (anamnese.expectativas) html += `<p><strong>Expectativas da família:</strong> ${anamnese.expectativas}</p>`;
     }
 
     if (evolucoes.length > 0) {
-      html += `<h3 style="color:#1F4E5F; font-size:1rem; margin-top:16px;">Síntese das sessões (${evolucoes.length})</h3>`;
-      // Pega os últimos 5 registros como amostra
+      html += `<h3 style="color:#9C4258; font-size:1rem; margin-top:16px;">Síntese das sessões (${evolucoes.length})</h3>`;
       evolucoes.slice(-5).forEach(ev => {
         const d = ev.data ? new Date(ev.data + 'T12:00').toLocaleDateString('pt-BR') : '—';
         html += `<p><strong>${d}</strong> — ${ev.objetivo || 'Sessão realizada'}`;
@@ -89,13 +91,13 @@ document.getElementById('btnGerar').addEventListener('click', async () => {
     }
 
     html += `
-      <h3 style="color:#1F4E5F; font-size:1rem; margin-top:16px;">Observações profissionais</h3>
+      <h3 style="color:#9C4258; font-size:1rem; margin-top:16px;">Observações profissionais</h3>
       <p><em>(Edite este campo antes de imprimir)</em></p>
       <p>&nbsp;</p>
       <p>&nbsp;</p>
-      <hr style="margin:24px 0; border:none; border-top:1px solid #EAE5D9;" />
-      <p style="font-size:0.9rem; color:#6B6B6B;">_________________________________________</p>
-      <p style="font-size:0.9rem; color:#6B6B6B;">Psicopedagoga responsável</p>
+      <hr style="margin:24px 0; border:none; border-top:1px solid #F5E3E7;" />
+      <p style="font-size:0.9rem; color:#8A6A72;">_________________________________________</p>
+      <p style="font-size:0.9rem; color:#8A6A72;">Psicopedagoga responsável</p>
     `;
 
     document.getElementById('relatorioConteudo').innerHTML = html;
