@@ -4,15 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Meu Espaço Psicopedagógico</title>
+    <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#C96B82" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
+  
 </head>
 <body>
   <div id="app-header"></div>
 
-  <div class="container">
+    <div class="container">
     <div class="card">
       <h2 id="saudacao">Olá!</h2>
       <p id="dataAtual" style="color:#8A6A72; margin-top:4px;"></p>
@@ -21,22 +24,10 @@
     <div class="card">
       <h2>Resumo do mês</h2>
       <div style="display:flex; gap:16px; flex-wrap:wrap;">
-        <div class="indicador">
-          <p>Alunos ativos</p>
-          <p style="color:#9C4258;" id="qtdAlunos">0</p>
-        </div>
-        <div class="indicador">
-          <p>Recebido no mês</p>
-          <p style="color:#6FA97A;" id="dashReceitas">R$ 0,00</p>
-        </div>
-        <div class="indicador">
-          <p>Pendente</p>
-          <p style="color:#E0A96D;" id="dashPendentes">R$ 0,00</p>
-        </div>
-        <div class="indicador">
-          <p>Despesas</p>
-          <p style="color:#C9556B;" id="dashDespesas">R$ 0,00</p>
-        </div>
+        <div class="indicador"><p>Alunos ativos</p><p style="color:#9C4258;" id="qtdAlunos">0</p></div>
+        <div class="indicador"><p>Recebido no mês</p><p style="color:#6FA97A;" id="dashReceitas">R$ 0,00</p></div>
+        <div class="indicador"><p>Pendente</p><p style="color:#E0A96D;" id="dashPendentes">R$ 0,00</p></div>
+        <div class="indicador"><p>Despesas</p><p style="color:#C9556B;" id="dashDespesas">R$ 0,00</p></div>
       </div>
     </div>
 
@@ -59,6 +50,47 @@
     </div>
   </div>
 
+  <!-- MODAL: CRIAR PLANEJAMENTO RÁPIDO -->
+  <div class="modal-overlay" id="modalPlanoRapido">
+    <div class="modal-box">
+      <h2><span>Novo planejamento</span><button class="modal-fechar" data-fechar-modal="modalPlanoRapido">✕</button></h2>
+      <label>Título *</label>
+      <input id="rapTitulo" type="text" />
+      <label>Data prevista</label>
+      <input id="rapData" type="date" />
+      <label>Objetivo</label>
+      <textarea id="rapObjetivo" rows="2"></textarea>
+      <label>Conteúdo / atividades</label>
+      <textarea id="rapConteudo" rows="3"></textarea>
+      <div id="msgPlanoRapido" class="msg"></div>
+      <div class="modal-acoes">
+        <button class="secundario" data-fechar-modal="modalPlanoRapido">Cancelar</button>
+        <button class="primary" id="btnSalvarPlanoRapido">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VISUALIZAR PLANEJAMENTO -->
+  <div class="modal-overlay" id="modalVerPlanoDash">
+    <div class="modal-box" style="max-width: 800px;">
+      <h2>
+        <span id="verPlanoTituloDash">Visualizar Planejamento</span>
+        <button class="modal-fechar" onclick="document.getElementById('modalVerPlanoDash').classList.remove('aberto')">✕</button>
+      </h2>
+      <div style="margin-bottom: 16px; color:var(--texto-suave); font-size:0.9rem;">
+        <strong>Aluno:</strong> <span id="verPlanoAlunoDash"></span> <br>
+        <strong>Data:</strong> <span id="verPlanoDataDash"></span>
+      </div>
+      <div id="verPlanoMomentosDash" style="display:flex; flex-direction:column; gap:12px;"></div>
+      <div id="verPlanoObsDash" style="margin-top: 20px; background: var(--creme); padding: 14px; border-radius: 10px; font-size:0.9rem; display:none;">
+        <strong>Observações:</strong><br><span id="verPlanoObsTextoDash"></span>
+      </div>
+      <div class="modal-acoes">
+        <button class="primary" onclick="document.getElementById('modalVerPlanoDash').classList.remove('aberto')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -68,18 +100,19 @@
   <script>
     protegerPagina();
     const fmt = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    let usuarioAtual = null;
+    let planosMap = {};
 
     auth.onAuthStateChanged(async (user) => {
       if (!user) return;
+      usuarioAtual = user;
 
       const hora = new Date().getHours();
       const periodo = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
       document.getElementById('saudacao').textContent = `${periodo}, bem-vinda!`;
 
       const hoje = new Date();
-      document.getElementById('dataAtual').textContent = hoje.toLocaleDateString('pt-BR',
-        { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
+      document.getElementById('dataAtual').textContent = hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       const mesAtual = hoje.toISOString().slice(0, 7);
 
       const alSnap = await db.collection('students').where('ownerId', '==', user.uid).get();
@@ -107,8 +140,13 @@
       document.getElementById('dashDespesas').textContent = fmt(despesas);
 
       const agSnap = await db.collection('appointments').where('ownerId', '==', user.uid).get();
+      const planosSnap = await db.collection('plans').where('ownerId', '==', user.uid).get();
+
       const alunosMap = {};
       alSnap.forEach(d => alunosMap[d.id] = d.data().nome);
+
+      planosMap = {}; 
+      planosSnap.forEach(d => planosMap[d.id] = { id: d.id, ...d.data() });
 
       const hojeStr = hoje.toISOString().slice(0, 10);
       const proximos = agSnap.docs.map(d => ({ id: d.id, ...d.data() }))
@@ -121,14 +159,163 @@
         ul.innerHTML = '<li style="color:#8A6A72;">Nenhum atendimento agendado.</li>';
       } else {
         ul.innerHTML = proximos.map(a => {
-          const d = new Date(a.data + 'T' + a.hora).toLocaleString('pt-BR',
-            { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-          return `<li style="padding:10px 0; border-bottom:1px solid #F5E3E7;">
-            <strong>${d}</strong> — ${alunosMap[a.alunoId] || '(aluno removido)'}
-            <span style="color:#8A6A72;">(${a.status})</span>
+          const d = new Date(a.data + 'T' + a.hora).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+          const planoInfo = a.planoId && planosMap[a.planoId] ? planosMap[a.planoId] : null;
+          
+          let blocoPlano = '';
+          if (planoInfo) {
+            blocoPlano = `<div style="margin-top: 6px;">
+              <span class="badge em_andamento" style="cursor:pointer;" onclick="abrirPlanoDash('${planoInfo.id}')" title="Clique para ver">📋 ${planoInfo.titulo}</span>
+            </div>`;
+          } else {
+            blocoPlano = `<div style="margin-top: 6px;">
+              <a href="javascript:void(0)" style="font-size:0.8rem; font-weight:700; color:var(--rosa-forte);" onclick="abrirCriarPlanoDash('${a.id}', '${a.alunoId}')">+ Criar planejamento</a>
+            </div>`;
+          }
+
+          return `
+          <li style="padding:12px 0; border-bottom:1px solid #F5E3E7;">
+            <div>
+              <strong>${d}</strong> — ${alunosMap[a.alunoId] || '(aluno removido)'}
+              <span style="color:#8A6A72; font-size:0.9rem;">(${a.status})</span>
+            </div>
+            ${blocoPlano}
           </li>`;
         }).join('');
       }
+    });
+
+    /* --- FUNÇÕES DO DASHBOARD --- */
+    function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
+    function abrirModal(id) { document.getElementById(id).classList.add('aberto'); }
+
+    window.abrirCriarPlanoDash = function(appointmentId, alunoId) {
+      document.getElementById('rapTitulo').value = '';
+      document.getElementById('rapData').value = '';
+      document.getElementById('rapObjetivo').value = '';
+      document.getElementById('rapConteudo').value = '';
+      document.getElementById('msgPlanoRapido').className = 'msg';
+      
+      const btn = document.getElementById('btnSalvarPlanoRapido');
+      btn.dataset.appointmentId = appointmentId;
+      btn.dataset.alunoId = alunoId;
+      abrirModal('modalPlanoRapido');
+    };
+
+        document.getElementById('btnSalvarPlanoRapido').addEventListener('click', async () => {
+      const msg = document.getElementById('msgPlanoRapido');
+      const btn = document.getElementById('btnSalvarPlanoRapido');
+      const alunoId = btn.dataset.alunoId;
+      const appointmentId = btn.dataset.appointmentId;
+      const titulo = document.getElementById('rapTitulo').value.trim();
+
+      if (!titulo) { msg.className = 'msg erro'; msg.textContent = 'Preencha o título.'; return; }
+
+      try {
+        const ref = await db.collection('plans').add({
+          alunoId, 
+          appointmentId: appointmentId || null,
+          titulo,
+          dataPrevista: document.getElementById('rapData').value || null,
+          status: 'em_andamento',
+          objetivo: document.getElementById('rapObjetivo').value.trim() || null,
+          conteudo: document.getElementById('rapConteudo').value.trim() || null,
+          observacoes: null,
+          ownerId: usuarioAtual.uid,
+          criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+          atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        if (appointmentId) {
+          await db.collection('appointments').doc(appointmentId).update({ planoId: ref.id });
+        }
+        msg.className = 'msg sucesso'; msg.textContent = 'Plano criado!';
+        
+        // Recarrega a tela para atualizar a lista
+        setTimeout(() => location.reload(), 800);
+      } catch (e) {
+        console.error(e);
+        msg.className = 'msg erro'; msg.textContent = 'Erro ao criar planejamento.';
+      }
+    });
+
+        window.abrirPlanoDash = function(id) {
+      const p = planosMap[id];
+      if (!p) return;
+
+      document.getElementById('verPlanoTituloDash').textContent = p.titulo;
+      document.getElementById('verPlanoAlunoDash').textContent = p.alunoId;
+      document.getElementById('verPlanoDataDash').textContent = p.dataPrevista ? new Date(p.dataPrevista + 'T00:00').toLocaleDateString('pt-BR') : 'Não definida';
+
+      const boxMomentos = document.getElementById('verPlanoMomentosDash');
+      boxMomentos.innerHTML = '';
+
+      if (p.momentos && p.momentos.length > 0) {
+        p.momentos.forEach((m, i) => {
+          boxMomentos.insertAdjacentHTML('beforeend', `
+            <div style="background:var(--creme); padding:14px; border-radius:10px; border-left:4px solid var(--rosa-medio); margin-bottom:12px;">
+              <strong style="color:var(--rosa-profundo); display:block; margin-bottom:6px;">${i + 1}º Momento: ${m.nome || '—'}</strong>
+              <div style="font-size:0.9rem; margin-bottom:8px; color:var(--texto-suave);"><strong>Objetivo:</strong> ${m.objetivo || '—'}</div>
+              <div style="font-size:0.9rem; color:var(--texto); margin-bottom:8px; display:flex; gap:16px; align-items:center;">
+                <strong style="color:var(--texto-suave);">Objetivo alcançado?</strong>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-weight:400; margin:0;"><input type="radio" name="eval_atingido_${i}" value="sim" ${m.atingido === 'sim' ? 'checked' : ''}> Sim</label>
+                <label style="display:inline-flex; align-items:center; gap:4px; font-weight:400; margin:0;"><input type="radio" name="eval_atingido_${i}" value="nao" ${m.atingido === 'nao' ? 'checked' : ''}> Não</label>
+              </div>
+              <label style="margin-top:6px; font-size:0.85rem;">Observações do Momento</label>
+              <input type="text" id="eval_obs_${i}" value="${m.obs || ''}" style="padding:8px 12px; font-size:0.9rem;" placeholder="Como foi o resultado?">
+            </div>
+          `);
+        });
+      } else {
+        boxMomentos.innerHTML = '<p style="color:#8A6A72;">Nenhum momento detalhado.</p>';
+      }
+
+      const obsBox = document.getElementById('verPlanoObsDash');
+      if (p.observacoes) {
+        obsBox.style.display = 'block';
+        document.getElementById('verPlanoObsTextoDash').textContent = p.observacoes;
+      } else { obsBox.style.display = 'none'; }
+
+      // Altera os botões
+      const acoesBox = document.querySelector('#modalVerPlanoDash .modal-acoes');
+      acoesBox.innerHTML = `
+        <button class="secundario" onclick="document.getElementById('modalVerPlanoDash').classList.remove('aberto')">Fechar</button>
+        <button class="primary" onclick="salvarAvaliacaoDash('${p.id}')">Salvar Avaliação</button>
+      `;
+
+      document.getElementById('modalVerPlanoDash').classList.add('aberto');
+    };
+
+    window.salvarAvaliacaoDash = async function(id) {
+      const p = planosMap[id];
+      if (!p) return;
+
+      const momentosAtualizados = [];
+      if (p.momentos) {
+        p.momentos.forEach((m, i) => {
+          const radio = document.querySelector(`input[name="eval_atingido_${i}"]:checked`);
+          const obsInput = document.getElementById(`eval_obs_${i}`);
+          momentosAtualizados.push({ ...m, atingido: radio ? radio.value : null, obs: obsInput ? obsInput.value.trim() : '' });
+        });
+      }
+
+      try {
+        await db.collection('plans').doc(id).update({
+          momentos: momentosAtualizados,
+          atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        planosMap[id].momentos = momentosAtualizados;
+        alert('Avaliação salva com sucesso!');
+        document.getElementById('modalVerPlanoDash').classList.remove('aberto');
+      } catch (e) { alert('Erro ao salvar avaliação.'); }
+    };
+
+    // Fechar modais genéricos ao clicar no X ou overlay
+    document.querySelectorAll('[data-fechar-modal]').forEach(btn => {
+      btn.addEventListener('click', () => fecharModal(btn.dataset.fecharModal));
+    });
+    document.querySelectorAll('.modal-overlay').forEach(ov => {
+      ov.addEventListener('click', (e) => { if (e.target === ov) fecharModal(ov.id); });
     });
   </script>
 </body>

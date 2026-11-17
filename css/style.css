@@ -612,6 +612,110 @@ table.grade td:hover { background: var(--rosa-bebe); }
   table.grade td { width: 26px; height: 26px; font-size: 0.85rem; }
 }
 
+/* ============ MODAL GENÉRICO ============ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 48, 56, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 1500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeInUp 0.2s ease both;
+}
+.modal-overlay.aberto { display: flex; }
+
+.modal-box {
+  background: var(--branco);
+  border-radius: var(--raio-grande);
+  padding: 26px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(156, 66, 88, 0.25);
+  border: 1px solid rgba(232, 160, 176, 0.3);
+  animation: fadeInUp 0.3s ease both;
+}
+
+.modal-box h2 {
+  color: var(--rosa-profundo);
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+  padding-left: 14px;
+  border-left: 4px solid var(--rosa-medio);
+  border-radius: 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-fechar {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: var(--texto-suave);
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: var(--transicao);
+}
+.modal-fechar:hover { background: var(--rosa-bebe); color: var(--rosa-profundo); }
+
+.modal-acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  justify-content: flex-end;
+}
+.modal-acoes button.primary { width: auto; margin-top: 0; }
+.modal-acoes button.secundario { margin-top: 0; }
+
+/* ============ STATUS BADGES (planejamentos) ============ */
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+.badge.pendente     { background: #FFF1D6; color: #B27A1E; }
+.badge.em_andamento { background: #E3F0FB; color: #2E6EA6; }
+.badge.realizado    { background: #E8F4EB; color: var(--sucesso); }
+.badge.cancelado    { background: #FBE4E8; color: var(--erro); }
+
+/* ============ FORM GRID 2 COLUNAS ============ */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+.form-grid .col-full { grid-column: 1 / -1; }
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+/* Botão de ação compacto em tabela */
+.btn-acao {
+  background: var(--rosa-bebe);
+  color: var(--rosa-profundo);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: inherit;
+  margin-right: 4px;
+  transition: var(--transicao);
+}
+.btn-acao:hover { background: var(--rosa-suave); transform: translateY(-1px); }
+.btn-acao.danger:hover { background: #FBE4E8; color: var(--erro); }
+
 /* ============ IMPRESSÃO ============ */
 @media print {
   body { background: #fff !important; }

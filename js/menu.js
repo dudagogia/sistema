@@ -9,6 +9,7 @@
     { href: 'alunos.html',        label: 'Alunos',        icon: '👧' },
     { href: 'anamnese.html',      label: 'Anamnese',      icon: '📋' },
     { href: 'agenda.html',        label: 'Agenda',        icon: '📅' },
+    { href: 'planejamentos.html', label: 'Planejamentos', icon: '📋' },
     { href: 'evolucao.html',      label: 'Evolução',      icon: '📝' },
     { href: 'financeiro.html',    label: 'Financeiro',    icon: '💰' },
     { href: 'relatorios.html',    label: 'Relatórios',    icon: '📄' },
@@ -116,3 +117,16 @@
     montar();
   }
 })();
+
+// Registrar o Service Worker para o PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(registration => {
+        console.log('Service Worker registrado com sucesso:', registration.scope);
+      })
+      .catch(error => {
+        console.log('Falha ao registrar o Service Worker:', error);
+      });
+  });
+}

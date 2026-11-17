@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planejamentos — Meu Espaço Psicopedagógico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+
+  <div class="container">
+    <div class="card">
+      <h2>Planejamentos</h2>
+
+      <div class="filtros">
+        <select id="filtroAluno"><option value="">Todos os alunos</option></select>
+        <select id="filtroStatus">
+          <option value="">Todos os status</option>
+          <option value="pendente">Pendente</option>
+          <option value="em_andamento">Em andamento</option>
+          <option value="realizado">Realizado</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+        <input id="filtroBusca" type="text" placeholder="Buscar por título..." />
+        <button class="primary" id="btnNovoPlano" style="width:auto; margin-top:0;">+ Novo planejamento</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Aluno</th>
+            <th>Data prevista</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="listaPlanos">
+          <tr><td colspan="5" style="text-align:center; color:#8A6A72;">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL: CRIAR / EDITAR PLANEJAMENTO -->
+  <div class="modal-overlay" id="modalPlano">
+    <div class="modal-box" style="max-width: 800px;">
+      <h2 id="modalPlanoTitulo">
+        <span>Novo planejamento</span>
+        <button class="modal-fechar" data-fechar-modal="modalPlano">✕</button>
+      </h2>
+
+      <div class="form-grid">
+        <div class="col-full">
+          <label>Aluno *</label>
+          <select id="planoAluno"></select>
+        </div>
+
+        <div class="col-full">
+          <label>Título *</label>
+          <input id="planoTitulo" type="text" placeholder="Ex.: Sessão 12 — Consciência fonológica" />
+        </div>
+
+        <div>
+          <label>Data prevista</label>
+          <input id="planoData" type="date" />
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select id="planoStatus">
+            <option value="pendente">Pendente</option>
+            <option value="em_andamento">Em andamento</option>
+            <option value="realizado">Realizado</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+
+        <div class="col-full">
+          <label>Observações Gerais</label>
+          <textarea id="planoObservacoes" rows="2"></textarea>
+        </div>
+      </div>
+
+      <hr style="border:none; border-top: 1.5px dashed #F5E3E7; margin: 24px 0;" />
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <h3 style="color:var(--rosa-profundo); font-size:1rem;">Momentos da Aula</h3>
+        <button class="secundario" id="btnAddMomento" type="button">+ Adicionar Momento</button>
+      </div>
+
+      <!-- Container onde os momentos serão injetados via JS -->
+      <div id="listaMomentosForm"></div>
+      <p id="avisoLimiteMomentos" style="font-size:0.8rem; color:var(--erro); display:none;">Limite máximo de 6 momentos atingido.</p>
+
+      <div id="msgPlano" class="msg"></div>
+
+      <div class="modal-acoes">
+        <button class="secundario" data-fechar-modal="modalPlano">Cancelar</button>
+        <button class="primary" id="btnSalvarPlano">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VISUALIZAR PLANEJAMENTO -->
+  <div class="modal-overlay" id="modalVerPlano">
+    <div class="modal-box" style="max-width: 800px;">
+      <h2>
+        <span id="verPlanoTitulo">Visualizar Planejamento</span>
+        <button class="modal-fechar" data-fechar-modal="modalVerPlano">✕</button>
+      </h2>
+      
+      <div style="margin-bottom: 16px; color:var(--texto-suave); font-size:0.9rem;">
+        <strong>Aluno:</strong> <span id="verPlanoAluno"></span> <br>
+        <strong>Data:</strong> <span id="verPlanoData"></span>
+      </div>
+
+      <div id="verPlanoMomentos" style="display:flex; flex-direction:column; gap:12px;"></div>
+
+      <div id="verPlanoObs" style="margin-top: 20px; background: var(--creme); padding: 14px; border-radius: 10px; font-size:0.9rem; display:none;">
+        <strong>Observações:</strong><br>
+        <span id="verPlanoObsTexto"></span>
+      </div>
+
+      <div class="modal-acoes">
+        <button class="primary" data-fechar-modal="modalVerPlano">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/planejamentos.js"></script>
+</body>
+</html>
