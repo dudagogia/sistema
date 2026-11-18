@@ -137,7 +137,7 @@ function renderizarTabelaAgenda() {
     return;
   }
 
-  tbody.innerHTML = listaFiltrada.map(a => {
+    tbody.innerHTML = listaFiltrada.map(a => {
     const aluno = alunosCache.find(x => x.id === a.alunoId);
     const nome = aluno ? aluno.nome : '(removido)';
     const dataFmt = new Date(a.data + 'T' + a.hora).toLocaleDateString('pt-BR');
@@ -150,17 +150,17 @@ function renderizarTabelaAgenda() {
 
     return `
       <tr>
-        <td>${dataFmt}</td>
-        <td>${a.hora}</td>
-        <td>${nome}</td>
-        <td>${planoTag}</td>
-        <td>${a.status}</td>
-        <td>
+        <td data-label="Data">${dataFmt}</td>
+        <td data-label="Hora">${a.hora}</td>
+        <td data-label="Aluno" style="font-weight:700; color:var(--rosa-profundo);">${nome}</td>
+        <td data-label="Planejamento">${planoTag}</td>
+        <td data-label="Status">${a.status}</td>
+        <td data-label="Ações">
           <div style="display: flex; align-items: center; gap: 8px;">
             <select onchange="mudarStatus('${a.id}', this.value)" style="padding: 6px; width: auto; margin: 0;">
               ${['agendado','confirmado','realizado','cancelado','falta'].map(s => `<option value="${s}" ${a.status === s ? 'selected' : ''}>${s}</option>`).join('')}
             </select>
-            <button class="btn-acao" onclick="prepararCompartilhamento('${a.id}')" title="Compartilhar com o responsável">📤</button>
+            <button class="btn-acao" onclick="prepararCompartilhamento('${a.id}')" title="Compartilhar">📤</button>
             <button class="secundario" onclick="excluirAg('${a.id}')" style="padding: 6px 12px; margin: 0;">X</button>
           </div>
         </td>
@@ -381,7 +381,7 @@ window.prepararCompartilhamento = function(id) {
   document.getElementById('cardFrase').textContent = `"${fraseSorteada}"`;
 
   // Reseta o modal para a aba "Lembrete" por padrão toda vez que abrir
-  window.mudarTipoMensagem('lembrete');
+  window.mudarTipoMensagem('confirmacao'); 
 
   // Abre o modal
   abrirModal('modalCompartilhar');
@@ -426,7 +426,8 @@ window.mudarTipoMensagem = function(tipo) {
 
 document.getElementById('btnBaixarCard').addEventListener('click', async () => {
   const btn = document.getElementById('btnBaixarCard');
-  btn.textContent = 'Gerando imagem...';
+  const textoOriginal = btn.textContent;
+  btn.textContent = 'Gerando...';
   btn.disabled = true;
 
   const recadoExtra = document.getElementById('cardRecado').value.trim();
@@ -443,23 +444,41 @@ document.getElementById('btnBaixarCard').addEventListener('click', async () => {
   try {
     const cardElement = document.getElementById('cardComprovante');
     
-    const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: null }); 
-    const image = canvas.toDataURL("image/png");
+    // Renderiza o card em formato de imagem
+    const canvas = await html2canvas(cardElement, { 
+      scale: 2, 
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: true
+    }); 
     
-    const link = document.createElement('a');
-    link.download = `atendimento-${(alunosCache.find(x => x.id === appointmentParaCompartilhar.alunoId)?.nome || 'aluno').replace(/\s/g, '-')}.png`;
-    link.href = image;
-    link.click();
+    // Converte para formato Blob (melhor para mobile)
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `atendimento-${(alunosCache.find(x => x.id === appointmentParaCompartilhar.alunoId)?.nome || 'aluno').replace(/\s/g, '-')}.png`;
+      link.href = url;
+      
+      // Truque para funcionar no iOS/Safari
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // No iOS, às vezes abre em nova aba, então avisamos o usuário
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        alert('Se a imagem não foi baixada automaticamente, pressione e segure sobre a imagem na nova aba para salvar.');
+      }, 1000);
+    }, 'image/png');
 
     document.getElementById('cardComprovante').innerHTML = cardOriginalHTML;
-    
-    btn.textContent = 'Baixar Imagem';
+    btn.textContent = textoOriginal;
     btn.disabled = false;
     fecharModal('modalCompartilhar');
   } catch (e) {
     console.error(e);
-    alert('Erro ao gerar imagem.');
-    btn.textContent = 'Baixar Imagem';
+    alert('Erro ao gerar imagem. Tente novamente.');
+    btn.textContent = textoOriginal;
     btn.disabled = false;
     document.getElementById('cardComprovante').innerHTML = cardOriginalHTML;
   }

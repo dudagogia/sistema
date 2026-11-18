@@ -727,3 +727,96 @@ table.grade td:hover { background: var(--rosa-bebe); }
   table.grade td { border: 1px solid #999 !important; }
   * { animation: none !important; transition: none !important; }
 }
+
+/* ============ RESPONSIVO TABELA AGENDA ============ */
+@media (max-width: 899px) {
+  /* Esconde o cabeçalho original */
+  .card table thead {
+    display: none; 
+  }
+
+  /* Transforma a tabela em bloco */
+  .card table, 
+  .card tbody, 
+  .card tr, 
+  .card td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Configura o cartão */
+  .card tr {
+    background: #FFFFFF;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    border: 1px solid #F5E3E7;
+    box-shadow: 0 4px 10px rgba(201, 107, 130, 0.08);
+    padding: 12px;
+  }
+  
+  /* Configura cada linha de informação dentro do cartão */
+  .card td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px;
+    border: none;
+    border-bottom: 1px dashed #F5E3E7;
+    text-align: right;
+    font-size: 0.9rem;
+    word-break: break-word; /* Força o texto a quebrar linha se for muito longo */
+  }
+  
+  /* Remove a borda do último item (Ações) */
+  .card td:last-child {
+    border-bottom: none;
+    padding-top: 12px;
+  }
+
+  /* Cria os rótulos (Data, Hora, Aluno...) à esquerda */
+  .card td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #8A6A72;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: left;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  
+  /* Ajusta a área de Ações para ficar em linha e não quebrar */
+  .card td[data-label="Ações"] {
+    display: block; /* Libera o Flexbox do td para a div interna */
+    padding-top: 15px;
+  }
+
+  .card td[data-label="Ações"]::before {
+    display: none; /* Esconde a palavra "AÇÕES" no celular para não bugar */
+  }
+
+  .card td[data-label="Ações"] > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    align-items: center;
+  }
+  
+  .card td[data-label="Ações"] select {
+    flex: 1;
+    padding: 6px;
+    margin: 0;
+    max-width: 60%;
+  }
+
+  /* Deixa a tag de planejamento com tamanho controlado */
+  .card td[data-label="Planejamento"] span {
+    display: inline-block;
+    white-space: normal;
+    text-align: right;
+    max-width: 180px;
+  }
+}
