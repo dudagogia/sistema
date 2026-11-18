@@ -86,7 +86,7 @@ document.getElementById('btnGerar').addEventListener('click', () => {
     : null;
 
   const html = `
-    <h1>Meu Espaço Psicopedagógico</h1>
+    <h1>Dudagogia | Espaço Psicopedagógico</h1>
     <p class="meta">Ficha de atividade psicopedagógica</p>
 
     <div class="linha"><strong>Aluno:</strong> ${aluno.nome || '—'} ${idade !== null ? `(${idade} anos)` : ''}</div>

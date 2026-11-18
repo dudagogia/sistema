@@ -1,16 +1,15 @@
 // js/menu.js
-// Monta header responsivo + menu lateral (mobile) + overlay.
-// Deve ser incluído DEPOIS do auth.js em todas as páginas internas.
-// Uso no HTML: <div id="app-header"></div> logo após <body>.
-
 (function () {
-  const links = [
+  const linksPrincipais = [
     { href: 'dashboard.html',     label: 'Dashboard',     icon: '🏠' },
     { href: 'alunos.html',        label: 'Alunos',        icon: '👧' },
     { href: 'anamnese.html',      label: 'Anamnese',      icon: '📋' },
     { href: 'agenda.html',        label: 'Agenda',        icon: '📅' },
-    { href: 'planejamentos.html', label: 'Planejamentos', icon: '📋' },
-    { href: 'evolucao.html',      label: 'Evolução',      icon: '📝' },
+    { href: 'planejamentos.html', label: 'Planejamentos', icon: '📝' },
+    { href: 'evolucao.html',      label: 'Evolução',      icon: '📈' }
+  ];
+
+  const linksMais = [
     { href: 'financeiro.html',    label: 'Financeiro',    icon: '💰' },
     { href: 'relatorios.html',    label: 'Relatórios',    icon: '📄' },
     { href: 'atividades.html',    label: 'Atividades',    icon: '📚' },
@@ -19,13 +18,15 @@
     { href: 'jogos.html',         label: 'Jogos',         icon: '🎮' }
   ];
 
+  const todosLinks = [...linksPrincipais, ...linksMais];
   const paginaAtual = location.pathname.split('/').pop() || 'dashboard.html';
 
   function montar() {
     const container = document.getElementById('app-header');
     if (!container) return;
 
-    const linksHtml = links.map(l => {
+    // Monta os links principais
+    const linksPrincipaisHtml = linksPrincipais.map(l => {
       const ativo = l.href === paginaAtual ? 'ativo' : '';
       return `<a href="${l.href}" class="menu-link ${ativo}">
         <span class="menu-icone">${l.icon}</span>
@@ -33,17 +34,49 @@
       </a>`;
     }).join('');
 
-    // Header + menu + overlay como IRMÃOS (não aninhados)
+    // Monta os links do dropdown "Mais"
+    const linksMaisHtml = linksMais.map(l => {
+      const ativo = l.href === paginaAtual ? 'ativo' : '';
+      return `<a href="${l.href}" class="menu-link ${ativo}" style="padding: 10px 16px; border-radius: 8px; color: var(--texto); width: 100%; display: flex; margin-bottom: 2px;">
+        <span class="menu-icone">${l.icon}</span>
+        <span class="menu-label">${l.label}</span>
+      </a>`;
+    }).join('');
+
+    // Monta o menu mobile com todos os links
+    const linksMobileHtml = todosLinks.map(l => {
+      const ativo = l.href === paginaAtual ? 'ativo' : '';
+      return `<a href="${l.href}" class="menu-link ${ativo}">
+        <span class="menu-icone">${l.icon}</span>
+        <span class="menu-label">${l.label}</span>
+      </a>`;
+    }).join('');
+
     container.innerHTML = `
       <header class="app-header">
         <div class="header-topo">
-          <h1>Meu Espaço Psicopedagógico</h1>
+          <a href="dashboard.html" style="display: flex; align-items: center;">
+            <img src="logo.png" alt="Maria Eduarda Psicopedagoga" style="height: 40px; width: auto; object-fit: contain;">
+          </a>
           <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu" aria-expanded="false">
             <span></span><span></span><span></span>
           </button>
         </div>
+        
         <nav class="menu-desktop">
-          ${linksHtml}
+          ${linksPrincipaisHtml}
+          
+          <!-- BOTÃO MAIS (DROPDOWN) -->
+          <div class="dropdown" id="menuMaisDropdown">
+            <button class="menu-link dropdown-btn" style="background: none; border: none; cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 600;">
+              <span class="menu-icone">📁</span>
+              <span class="menu-label">Mais ▾</span>
+            </button>
+            <div class="dropdown-content" id="dropdownContent">
+              ${linksMaisHtml}
+            </div>
+          </div>
+
           <button class="logout" id="btnSair">Sair</button>
         </nav>
       </header>
@@ -55,7 +88,7 @@
           <span>Menu</span>
           <button class="menu-fechar" id="menuFechar" aria-label="Fechar menu">✕</button>
         </div>
-        ${linksHtml}
+        ${linksMobileHtml}
         <button class="logout" id="btnSairMobile">Sair</button>
       </nav>
     `;
@@ -66,6 +99,24 @@
     const btnFechar = document.getElementById('menuFechar');
     const btnSairDesktop = document.getElementById('btnSair');
     const btnSairMobile = document.getElementById('btnSairMobile');
+    
+    // Lógica do Dropdown
+    const dropdownBtn = document.querySelector('.dropdown-btn');
+    const dropdownContent = document.getElementById('dropdownContent');
+
+    if (dropdownBtn) {
+      dropdownBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownContent.classList.toggle('show');
+      });
+    }
+
+    // Fecha o dropdown se clicar fora
+    window.addEventListener('click', (e) => {
+      if (dropdownContent && dropdownContent.classList.contains('show') && !dropdownBtn.contains(e.target)) {
+        dropdownContent.classList.remove('show');
+      }
+    });
 
     function abrir() {
       menuMobile.classList.add('aberto');
@@ -89,23 +140,19 @@
     overlay.addEventListener('click', fechar);
     if (btnFechar) btnFechar.addEventListener('click', fechar);
 
-    // Fecha ao clicar em qualquer link (mobile)
     menuMobile.querySelectorAll('.menu-link').forEach(a => {
       a.addEventListener('click', fechar);
     });
 
-    // Botão Sair (usa fazerLogout do auth.js)
     if (typeof fazerLogout === 'function') {
       if (btnSairDesktop) btnSairDesktop.addEventListener('click', fazerLogout);
       if (btnSairMobile)  btnSairMobile.addEventListener('click', fazerLogout);
     }
 
-    // Fecha se a tela crescer para desktop
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 900) fechar();
     });
 
-    // Fecha com ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') fechar();
     });
@@ -117,16 +164,3 @@
     montar();
   }
 })();
-
-// Registrar o Service Worker para o PWA
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(registration => {
-        console.log('Service Worker registrado com sucesso:', registration.scope);
-      })
-      .catch(error => {
-        console.log('Falha ao registrar o Service Worker:', error);
-      });
-  });
-}

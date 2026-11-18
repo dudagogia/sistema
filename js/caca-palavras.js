@@ -140,7 +140,7 @@ document.getElementById('btnGerarCP').addEventListener('click', () => {
   const palavrasHtml = colocadas.map(p => `<span>${p}</span>`).join('');
 
   const ficha = `
-    <h1>Meu Espaço Psicopedagógico</h1>
+    <h1>Dudagogia | Espaço Psicopedagógico</h1>
     <p class="meta">${titulo}</p>
 
     <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px; font-size:0.9rem;">

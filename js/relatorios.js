@@ -62,7 +62,7 @@ document.getElementById('btnGerar').addEventListener('click', async () => {
     const hoje = new Date().toLocaleDateString('pt-BR');
 
     let html = `
-      <h1 style="color:#9C4258; font-size:1.4rem; margin-bottom:4px;">Meu Espaço Psicopedagógico</h1>
+      <h1 style="color:#9C4258; font-size:1.4rem; margin-bottom:4px;">Dudagogia | Espaço Psicopedagógico</h1>
       <h2 style="font-size:1.1rem; color:#9C4258; margin-bottom:16px;">${titulos[tipo]}</h2>
 
       <p><strong>Aluno:</strong> ${aluno.nome || '—'}</p>
