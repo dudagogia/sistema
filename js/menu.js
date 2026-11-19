@@ -164,3 +164,17 @@
     montar();
   }
 })();
+
+// js/menu.js (final do arquivo)
+const APP_VERSION = '2.0.0'; // Mude isso manualmente a cada deploy
+
+// Verifica se a versão mudou desde a última visita
+const cachedVersion = localStorage.getItem('app-version');
+if (cachedVersion && cachedVersion !== APP_VERSION) {
+  console.log('[App] Nova versão detectada. Forçando atualização...');
+  localStorage.setItem('app-version', APP_VERSION);
+  // Força o recarregamento ignorando o cache
+  window.location.reload(true);
+} else {
+  localStorage.setItem('app-version', APP_VERSION);
+}

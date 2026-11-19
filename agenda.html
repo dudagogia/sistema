@@ -89,23 +89,45 @@
 
   <!-- Modal rápido: novo planejamento a partir da agenda -->
   <div class="modal-overlay" id="modalPlanoRapido">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 800px;">
       <h2>
         <span>Novo planejamento</span>
         <button class="modal-fechar" data-fechar-modal="modalPlanoRapido">✕</button>
       </h2>
 
-      <label>Título *</label>
-      <input id="rapTitulo" type="text" />
+      <div class="form-grid">
+        <div class="col-full">
+          <label>Título *</label>
+          <input id="rapTitulo" type="text" />
+        </div>
+        <div>
+          <label>Data prevista</label>
+          <input id="rapData" type="date" />
+        </div>
+        <div>
+          <label>Status</label>
+          <select id="rapStatus">
+            <option value="em_andamento">Em andamento</option>
+            <option value="pendente">Pendente</option>
+            <option value="realizado">Realizado</option>
+          </select>
+        </div>
+        <div class="col-full">
+          <label>Observações Gerais</label>
+          <input id="rapObservacoes" type="text" placeholder="Ex: Trazer material específico" />
+        </div>
+      </div>
 
-      <label>Data prevista</label>
-      <input id="rapData" type="date" />
+      <hr style="border:none; border-top: 1.5px dashed #F5E3E7; margin: 24px 0;" />
 
-      <label>Objetivo</label>
-      <textarea id="rapObjetivo" rows="2"></textarea>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <h3 style="color:var(--rosa-profundo); font-size:1rem;">Momentos da Aula</h3>
+        <button class="secundario" id="btnAddMomentoRapido" type="button">+ Adicionar Momento</button>
+      </div>
 
-      <label>Conteúdo / atividades</label>
-      <textarea id="rapConteudo" rows="3"></textarea>
+      <!-- Container onde os momentos serão injetados -->
+      <div id="listaMomentosRapido"></div>
+      <p id="avisoLimiteMomentosRapido" style="font-size:0.8rem; color:var(--erro); display:none;">Limite máximo de 6 momentos atingido.</p>
 
       <div id="msgPlanoRapido" class="msg"></div>
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'espaco-psico-v1';
+const CACHE_NAME = 'espaco-psico-v2';
 const urlsToCache = [
   '/',
   '/login.html',
@@ -46,5 +46,25 @@ self.addEventListener('fetch', event => {
         }
         return fetch(event.request); // Se não, busca na internet
       })
+  );
+});
+
+// sw.js
+self.addEventListener('install', event => {
+  self.skipWaiting(); // Força a nova versão a ativar imediatamente
+  // ... código de cache ...
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName); // Limpa caches antigos
+          }
+        })
+      );
+    }).then(() => self.clients.claim()) // Assume o controle das páginas abertas
   );
 });

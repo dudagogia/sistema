@@ -490,6 +490,7 @@ function bindEventos() {
   document.getElementById('agAluno').addEventListener('change', atualizarSelectPlanos);
   document.getElementById('btnSalvarPlanoRapido').addEventListener('click', salvarPlanoRapido);
   document.getElementById('filtroAgenda').addEventListener('change', renderizarTabelaAgenda);
+  document.getElementById('btnAddMomentoRapido').addEventListener('click', () => adicionarMomentoRapido());
   
   document.getElementById('btnNovoPlanoAg').addEventListener('click', () => {
     const alunoIdAtual = document.getElementById('agAluno').value;
@@ -522,3 +523,138 @@ function preencherViaQueryString() {
   if (params.get('planoId')) document.getElementById('agPlano').value = params.get('planoId');
   if (params.get('data'))   document.getElementById('agData').value = params.get('data');
 }
+
+/* ---------------- MOMENTOS DO PLANEJAMENTO RÁPIDO ---------------- */
+let qtdMomentosRapido = 0;
+
+function criarBlocoMomentoHTMLRapido(index, dados = null) {
+  const d = dados || { nome: '', objetivo: '', atingido: null, obs: '' };
+  return `
+    <div class="momento-bloco card" id="momento-rapido-${index}" style="background:var(--creme); padding:16px; margin-bottom:12px; border:1px solid #F5E3E7; box-shadow:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <strong style="color:var(--rosa-profundo); font-size:0.95rem;">${index + 1}º Momento</strong>
+        <button type="button" class="btn-acao danger" onclick="removerMomentoRapido(${index})" style="padding:2px 8px;">✕</button>
+      </div>
+      
+      <label style="margin-top:0;">Atividade / Tema</label>
+      <input type="text" class="mom-nome" value="${d.nome || ''}" placeholder="Ex: Contagem de sílabas">
+
+      <label>Objetivo</label>
+      <textarea class="mom-objetivo" rows="2" placeholder="Ex: Ajudar as crianças a perceberem as sílabas">${d.objetivo || ''}</textarea>
+
+      <label>Objetivo alcançado?</label>
+      <div style="display:flex; gap:16px; margin-top:4px;">
+        <label style="display:flex; align-items:center; gap:6px; font-weight:400; margin-top:0; cursor:pointer;">
+          <input type="radio" name="rap_mom_atingido_${index}" value="sim" ${d.atingido === 'sim' ? 'checked' : ''}> Sim
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-weight:400; margin-top:0; cursor:pointer;">
+          <input type="radio" name="rap_mom_atingido_${index}" value="nao" ${d.atingido === 'nao' ? 'checked' : ''}> Não
+        </label>
+      </div>
+
+      <label>Obs:</label>
+      <input type="text" class="mom-obs" value="${d.obs || ''}" placeholder="Observações sobre este momento">
+    </div>
+  `;
+}
+
+function adicionarMomentoRapido(dados = null) {
+  const blocos = document.querySelectorAll('.momento-bloco').length;
+  if (blocos >= 6) return;
+  
+  const container = document.getElementById('listaMomentosRapido');
+  container.insertAdjacentHTML('beforeend', criarBlocoMomentoHTMLRapido(qtdMomentosRapido, dados));
+  qtdMomentosRapido++;
+  
+  atualizarAvisoLimiteRapido();
+}
+
+window.removerMomentoRapido = function(index) {
+  const el = document.getElementById(`momento-rapido-${index}`);
+  if (el) el.remove();
+  atualizarAvisoLimiteRapido();
+};
+
+function atualizarAvisoLimiteRapido() {
+  const blocos = document.querySelectorAll('.momento-bloco').length;
+  document.getElementById('avisoLimiteMomentosRapido').style.display = blocos >= 6 ? 'block' : 'none';
+  document.getElementById('btnAddMomentoRapido').style.display = blocos >= 6 ? 'none' : 'inline-block';
+}
+
+// Sobrescrevendo a função de salvar para incluir os momentos
+async function salvarPlanoRapido() {
+  const msg = document.getElementById('msgPlanoRapido');
+  const btn = document.getElementById('btnSalvarPlanoRapido');
+  
+  const alunoId = btn.dataset.alunoId; 
+  const appointmentId = btn.dataset.appointmentId; 
+  const titulo = document.getElementById('rapTitulo').value.trim();
+
+  if (!titulo) { msg.className = 'msg erro'; msg.textContent = 'Preencha o título.'; return; }
+
+  // Pega os momentos
+  const momentos = [];
+  document.querySelectorAll('#listaMomentosRapido .momento-bloco').forEach(bloco => {
+    const nome = bloco.querySelector('.mom-nome').value.trim();
+    const objetivo = bloco.querySelector('.mom-objetivo').value.trim();
+    const obs = bloco.querySelector('.mom-obs').value.trim();
+    const radioSelecionado = bloco.querySelector('input[type="radio"]:checked');
+    const atingido = radioSelecionado ? radioSelecionado.value : null;
+
+    if (nome || objetivo || obs || atingido) {
+      momentos.push({ nome, objetivo, obs, atingido });
+    }
+  });
+
+  try {
+    const ref = await db.collection('plans').add({
+      alunoId,
+      appointmentId: appointmentId || null,
+      titulo,
+      momentos: momentos, // SALVANDO OS MOMENTOS AQUI
+      dataPrevista: document.getElementById('rapData').value || null,
+      status: document.getElementById('rapStatus').value,
+      observacoes: document.getElementById('rapObservacoes').value.trim() || null,
+      ownerId: usuarioAtual.uid,
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp(),
+      atualizadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    if (appointmentId) {
+      await db.collection('appointments').doc(appointmentId).update({ planoId: ref.id });
+    }
+
+    msg.className = 'msg sucesso'; msg.textContent = 'Plano criado e vinculado!';
+    await carregarPlanos();
+    await carregarAgenda();
+    
+    // Limpa o form após fechar
+    setTimeout(() => {
+      fecharModal('modalPlanoRapido');
+      document.getElementById('listaMomentosRapido').innerHTML = '';
+      qtdMomentosRapido = 0;
+    }, 700);
+    
+  } catch (e) {
+    console.error(e);
+    msg.className = 'msg erro'; msg.textContent = 'Erro ao criar planejamento.';
+  }
+}
+
+// Atualiza a função de abrir o modal para iniciar com 1 momento vazio
+window.abrirCriarPlanoAgenda = function(appointmentId, alunoId) {
+  document.getElementById('rapTitulo').value = '';
+  document.getElementById('rapData').value = '';
+  document.getElementById('rapObservacoes').value = '';
+  document.getElementById('msgPlanoRapido').className = 'msg';
+  
+  document.getElementById('listaMomentosRapido').innerHTML = '';
+  qtdMomentosRapido = 0;
+  adicionarMomentoRapido(); // Começa com 1
+  
+  const btn = document.getElementById('btnSalvarPlanoRapido');
+  btn.dataset.appointmentId = appointmentId;
+  btn.dataset.alunoId = alunoId;
+  
+  abrirModal('modalPlanoRapido');
+};
